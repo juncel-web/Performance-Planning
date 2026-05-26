@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facilitator Dashboard — SCM KPI Workshop</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e14;--surface:#111620;--surface2:#171e2a;--surface3:#1d2636;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#e8edf5;--muted:#7a8799;--dim:#3a4555;
+  --gold:#c9a84c;--gold2:#e8c96a;--teal:#3ab8c8;
+  --green:#4ec98a;--amber:#d4923a;--red:#c84f4f;--blue:#4f8bc8;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 600px 400px at 20% 0%,rgba(201,168,76,.04) 0%,transparent 70%),radial-gradient(ellipse 400px 500px at 80% 100%,rgba(58,184,200,.04) 0%,transparent 70%);pointer-events:none;z-index:0;}
+
+/* MODE SELECTOR */
+#modeScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:500;flex-direction:column;gap:48px;}
+#modeScreen h1{font-family:'Fraunces',serif;font-size:36px;font-weight:600;color:var(--gold);text-align:center;}
+#modeScreen p{font-size:14px;color:var(--muted);text-align:center;margin-top:-36px;}
+.mode-cards{display:flex;gap:20px;}
+.mode-card{
+  background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;
+  padding:32px 36px;cursor:pointer;transition:all .2s;text-align:center;width:240px;
+}
+.mode-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 12px 40px rgba(201,168,76,.15);}
+.mode-icon{font-size:40px;margin-bottom:14px;}
+.mode-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.mode-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+.mode-badge{display:inline-block;margin-top:12px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:10px;background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.3);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes timerBlink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ════════════════════════════════════
+   FACILITATOR LAYOUT
+════════════════════════════════════ */
+#facView{
+  display:none;height:100vh;
+  grid-template-rows:52px 1fr;
+  grid-template-columns:248px 1fr 292px;
+  grid-template-areas:"topbar topbar topbar" "sidebar main aside";
+}
+#facView.active{display:grid;}
+
+/* TOPBAR */
+.topbar{grid-area:topbar;background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 18px;gap:14px;z-index:10;position:relative;}
+.tb-brand{font-family:'Fraunces',serif;font-size:16px;font-weight:600;color:var(--gold);}
+.tb-sep{width:1px;height:18px;background:var(--border2);}
+.tb-subtitle{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:9px;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;}
+.session-badge{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:5px 11px;font-size:12px;font-weight:500;}
+.btn-top{padding:6px 13px;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;border:none;transition:all .16s;}
+.btn-ghost{background:none;border:1px solid var(--border2);color:var(--muted);}
+.btn-ghost:hover{border-color:var(--text);color:var(--text);}
+.btn-gold{background:var(--gold);color:#0a0e14;}
+.btn-gold:hover{background:var(--gold2);}
+.btn-teal{background:rgba(58,184,200,.15);border:1px solid rgba(58,184,200,.4);color:var(--teal);}
+.btn-teal:hover{background:rgba(58,184,200,.25);}
+
+/* SIDEBAR */
+.sidebar{grid-area:sidebar;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;z-index:5;}
+.sidebar-sec{padding:14px 0;border-bottom:1px solid var(--border);}
+.sb-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--dim);padding:0 16px 7px;}
+.bni{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-left:2px solid transparent;transition:all .14s;}
+.bni:hover{background:rgba(255,255,255,.025);}
+.bni.active{border-left-color:var(--gold);background:rgba(201,168,76,.06);}
+.bni.done .bni-n{background:var(--green);border-color:var(--green);color:#0a0e14;}
+.bni-n{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--dim);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:8.5px;flex-shrink:0;transition:all .2s;}
+.bni.active .bni-n{border-color:var(--gold);color:var(--gold);}
+.bni-t{flex:1;}
+.bni-title{font-size:11.5px;font-weight:600;color:var(--text);line-height:1.2;}
+.bni-meta{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--muted);margin-top:1px;}
+.bni-s{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:.8px;padding:2px 5px;border-radius:9px;text-transform:uppercase;}
+.s-up{color:var(--dim);background:rgba(255,255,255,.025);border:1px solid var(--dim);}
+.s-act{color:var(--gold);background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);}
+.s-done{color:var(--green);background:rgba(78,201,138,.1);border:1px solid rgba(78,201,138,.3);}
+.sb-foot{margin-top:auto;padding:14px 16px;}
+.sb-prog-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.sb-prog-bar{height:3px;background:var(--dim);border-radius:2px;overflow:hidden;margin-bottom:5px;}
+.sb-prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--gold),var(--teal));transition:width .5s;}
+.sb-prog-pct{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);text-align:right;}
+
+/* MAIN */
+.main{grid-area:main;overflow-y:auto;background:var(--bg);padding:22px;z-index:1;}
+
+/* block hero */
+.block-hero{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:22px 26px;margin-bottom:18px;position:relative;overflow:hidden;animation:fadeUp .3s ease;}
+.bh-accent{position:absolute;top:0;left:0;right:0;height:3px;}
+.bh-eyebrow{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;display:flex;align-items:center;gap:7px;}
+.bh-eyebrow::before{content:'';display:block;width:10px;height:1px;background:var(--gold);}
+.bh-title{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.bh-sub{font-size:12.5px;color:var(--muted);margin-bottom:18px;}
+
+/* timer */
+.timer-row{display:flex;align-items:center;gap:14px;}
+.timer-big{font-family:'DM Mono',monospace;font-size:40px;font-weight:500;color:var(--gold);letter-spacing:2px;line-height:1;transition:color .3s;}
+.timer-big.warn{color:var(--amber);}
+.timer-big.danger{color:var(--red);animation:timerBlink 1s ease-in-out infinite;}
+.timer-right{flex:1;}
+.timer-prog{height:5px;background:var(--dim);border-radius:3px;overflow:hidden;margin-bottom:9px;}
+.timer-prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .5s linear,background .5s;}
+.timer-prog-fill.warn{background:linear-gradient(90deg,var(--gold),var(--amber));}
+.timer-prog-fill.danger{background:linear-gradient(90deg,var(--amber),var(--red));}
+.timer-btns{display:flex;gap:7px;flex-wrap:wrap;}
+.btn-tm{padding:8px 14px;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;border:none;transition:all .16s;display:flex;align-items:center;gap:5px;}
+.btn-start{background:var(--green);color:#0a0e14;}.btn-start:hover{background:#6ee7a8;}
+.btn-pause{background:var(--amber);color:#0a0e14;display:none;}.btn-pause:hover{background:#e8b05a;}
+.btn-reset{background:none;border:1px solid var(--border2);color:var(--muted);}.btn-reset:hover{border-color:var(--text);color:var(--text);}
+.btn-ext{background:none;border:1px solid rgba(201,168,76,.3);color:var(--gold);font-size:11px;padding:8px 11px;}.btn-ext:hover{background:rgba(201,168,76,.08);}
+
+/* panels */
+.panel{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:16px;}
+.panel-lbl{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.script-panel{border-left:3px solid var(--teal);border-radius:0 10px 10px 0;}
+.script-lbl{color:var(--teal);}
+.script-lbl::before{content:'';display:block;width:9px;height:1px;background:var(--teal);}
+.script-text{font-size:13.5px;color:#c8d8e4;line-height:1.75;font-style:italic;}
+.act-lbl::before{content:'▸';color:var(--gold);}
+.act-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.act-list li{display:flex;gap:9px;font-size:13px;color:var(--text);line-height:1.5;}
+.act-list li::before{content:'';display:block;width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:7px;}
+.tips-panel{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.18);}
+.tips-lbl{color:var(--gold);}.tips-lbl::before{content:'✦';font-size:9px;}
+.tips-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.tips-list li{display:flex;gap:8px;font-size:12px;color:#bda96a;line-height:1.5;}
+.tips-list li::before{content:'→';color:var(--gold);flex-shrink:0;font-weight:700;}
+
+.nav-row{display:flex;gap:10px;}
+.btn-nav{flex:1;padding:11px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.btn-prev-blk{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);}.btn-prev-blk:hover{border-color:var(--text);color:var(--text);}
+.btn-next-blk{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0e14;}.btn-next-blk:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,168,76,.25);}
+
+/* ASIDE */
+.aside{grid-area:aside;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.aside-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.aside-tab{flex:1;padding:12px 6px;font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .16s;text-align:center;}
+.aside-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.aside-tab:hover{color:var(--text);}
+.aside-body{flex:1;overflow-y:auto;padding:14px;}
+.aside-panel{display:none;}
+.aside-panel.active{display:block;animation:fadeUp .22s ease;}
+
+/* participants */
+.p-add{display:flex;gap:7px;margin-bottom:14px;}
+.p-add input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:7px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;transition:border .16s;}
+.p-add input::placeholder{color:var(--dim);}
+.p-add input:focus{border-color:var(--gold);}
+.p-add button{background:var(--gold);color:#0a0e14;border:none;border-radius:5px;padding:7px 12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center;}
+.stat-val{font-family:'Fraunces',serif;font-size:24px;font-weight:600;color:var(--gold);line-height:1;}
+.stat-lbl{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+.p-card{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:11px 13px;margin-bottom:8px;transition:border .16s;}
+.p-card:hover{border-color:var(--border2);}
+.p-card-top{display:flex;align-items:center;gap:9px;margin-bottom:7px;}
+.p-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:9.5px;font-weight:500;color:#0a0e14;flex-shrink:0;}
+.p-name{font-size:12px;font-weight:600;color:var(--text);}
+.p-dept{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--muted);margin-top:1px;}
+.p-prog{height:3px;background:var(--dim);border-radius:2px;overflow:hidden;margin-bottom:3px;}
+.p-prog-fill{height:100%;border-radius:2px;transition:width .4s;}
+.p-prog-lbl{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:8.5px;color:var(--muted);}
+.p-dots{display:flex;gap:2px;margin-top:7px;}
+.p-dot{flex:1;height:3px;border-radius:2px;background:var(--dim);transition:background .3s;}
+.p-dot.done{background:var(--green);}
+.p-dot.cur{background:var(--gold);}
+.p-flag-note{font-size:10.5px;color:var(--amber);margin-top:6px;padding:4px 7px;background:rgba(212,146,58,.08);border-radius:4px;}
+.p-acts{display:flex;gap:4px;margin-top:7px;}
+.p-btn{flex:1;padding:4px 6px;border-radius:4px;background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10.5px;cursor:pointer;transition:all .14s;}
+.p-btn:hover{border-color:var(--teal);color:var(--teal);}
+.p-btn.flag-btn:hover{border-color:var(--amber);color:var(--amber);}
+.p-btn.flagged{color:var(--amber);border-color:rgba(212,146,58,.4);}
+.empty-st{text-align:center;padding:28px 14px;color:var(--muted);font-size:12px;line-height:1.6;}
+.empty-ico{font-size:26px;opacity:.28;margin-bottom:7px;}
+
+/* notes */
+.notes-ta{width:100%;min-height:110px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;line-height:1.6;outline:none;resize:vertical;transition:border .16s;}
+.notes-ta:focus{border-color:var(--gold);}
+.notes-ts{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--dim);margin-top:5px;text-align:right;}
+.sec-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin:12px 0 7px;display:flex;align-items:center;gap:7px;}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--dim);opacity:.5;}
+.qa-btn{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:500;cursor:pointer;transition:all .16s;width:100%;margin-bottom:6px;}
+.qa-btn:hover{border-color:var(--border2);background:var(--surface3);}
+.qa-icon{font-size:13px;flex-shrink:0;}
+
+/* agenda mini */
+.ag-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:5px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;transition:all .16s;margin-bottom:5px;}
+.ag-row:hover{border-color:var(--border2);}
+.ag-row.cur{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.06);}
+.ag-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ag-name{font-size:11.5px;font-weight:500;flex:1;}
+.ag-time{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--muted);}
+
+/* scrollbar */
+::-webkit-scrollbar{width:3px;height:3px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px;}
+
+/* modals */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;}
+.modal-ov.open{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:11px;padding:26px;width:360px;box-shadow:0 24px 60px rgba(0,0,0,.5);animation:fadeUp .22s ease;}
+.modal-title{font-family:'Fraunces',serif;font-size:17px;color:var(--text);margin-bottom:5px;}
+.modal-sub{font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+.modal-inp{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;outline:none;margin-bottom:11px;transition:border .16s;}
+.modal-inp:focus{border-color:var(--gold);}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;}
+.modal-cancel{background:none;border:1px solid var(--border2);color:var(--muted);padding:7px 14px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.modal-confirm{background:var(--gold);color:#0a0e14;border:none;padding:7px 14px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+
+/* toast */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border2);border-top:2px solid var(--green);padding:9px 18px;border-radius:6px;font-size:12px;color:var(--text);font-weight:500;z-index:300;opacity:0;transition:opacity .28s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.toast.show{opacity:1;}
+
+/* ════════════════════════════════════
+   PROJECTOR VIEW
+════════════════════════════════════ */
+#projView{
+  display:none;height:100vh;width:100vw;
+  background:#0a0e14;
+  flex-direction:column;
+  position:relative;overflow:hidden;
+}
+#projView.active{display:flex;}
+#projView::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 800px 600px at 50% -10%,rgba(201,168,76,.06) 0%,transparent 65%);pointer-events:none;}
+
+.proj-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 48px;flex-shrink:0;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.proj-brand{font-family:'Fraunces',serif;font-size:14px;color:rgba(255,255,255,.3);letter-spacing:.5px;}
+.proj-block-indicator{
+  display:flex;gap:7px;align-items:center;
+}
+.proj-blk-dot{width:7px;height:7px;border-radius:50%;background:var(--dim);transition:all .4s;}
+.proj-blk-dot.done{background:var(--green);}
+.proj-blk-dot.cur{background:var(--gold);box-shadow:0 0 8px rgba(201,168,76,.5);}
+.proj-period{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.25);}
+
+.proj-body{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:0 80px;gap:80px;
+}
+.proj-left{flex:1;max-width:680px;}
+.proj-eyebrow{
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--gold);
+  margin-bottom:16px;display:flex;align-items:center;gap:12px;
+}
+.proj-eyebrow::before{content:'';display:block;width:20px;height:1.5px;background:var(--gold);}
+.proj-title{
+  font-family:'Fraunces',serif;font-size:56px;font-weight:700;
+  color:#fff;line-height:1.1;margin-bottom:20px;
+}
+.proj-activities{list-style:none;display:flex;flex-direction:column;gap:12px;}
+.proj-activities li{
+  display:flex;gap:14px;font-size:18px;color:rgba(255,255,255,.8);line-height:1.5;
+}
+.proj-activities li::before{
+  content:'';display:block;width:6px;height:6px;border-radius:50%;
+  flex-shrink:0;margin-top:9px;background:var(--gold);
+}
+
+.proj-right{flex-shrink:0;text-align:center;}
+.proj-timer{
+  font-family:'DM Mono',monospace;font-size:96px;font-weight:500;
+  line-height:1;letter-spacing:4px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;transition:all .3s;
+}
+.proj-timer.warn{background:linear-gradient(135deg,var(--amber),#f0c060);-webkit-background-clip:text;background-clip:text;}
+.proj-timer.danger{
+  background:linear-gradient(135deg,var(--red),#e87070);
+  -webkit-background-clip:text;background-clip:text;
+  animation:timerBlink 1s ease-in-out infinite;
+}
+.proj-timer-lbl{
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2.5px;
+  text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:6px;
+}
+.proj-timer-ring{
+  width:220px;height:220px;margin:0 auto 10px;position:relative;
+}
+.proj-timer-ring svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.proj-timer-ring circle.track{fill:none;stroke:rgba(255,255,255,.06);stroke-width:6;}
+.proj-timer-ring circle.fill{
+  fill:none;stroke:var(--gold);stroke-width:6;
+  stroke-linecap:round;
+  stroke-dasharray:628;stroke-dashoffset:0;
+  transition:stroke-dashoffset .5s linear, stroke .5s;
+}
+.proj-timer-inner{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+
+.proj-status-bar{
+  padding:12px 48px;display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;
+}
+.proj-status-left{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,.25);text-transform:uppercase;}
+.proj-status-right{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.2);}
+
+/* projector back button */
+.proj-back-btn{
+  position:fixed;top:14px;right:14px;z-index:100;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.4);padding:7px 13px;border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;
+  transition:all .18s;
+}
+.proj-back-btn:hover{background:rgba(255,255,255,.1);color:#fff;}
+</style>
+</head>
+<body>
+
+<!-- ══ MODE SELECTOR ══ -->
+<div id="modeScreen">
+  <div>
+    <h1>SCM KPI Workshop</h1>
+    <p>Choose your view to get started</p>
+  </div>
+  <div class="mode-cards">
+    <div class="mode-card" onclick="launchMode('fac')">
+      <div class="mode-icon">🎛️</div>
+      <div class="mode-title">Facilitator View</div>
+      <div class="mode-desc">Timer controls, script, participant tracking, and session notes. Keep this on your own screen.</div>
+      <div class="mode-badge">Private Screen</div>
+    </div>
+    <div class="mode-card" onclick="launchMode('proj')">
+      <div class="mode-icon">📺</div>
+      <div class="mode-title">Projector View</div>
+      <div class="mode-desc">Clean full-screen display showing the current block, activity instructions, and live countdown timer.</div>
+      <div class="mode-badge">Participant Screen</div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--dim);text-align:center;line-height:1.7;">
+    💡 Open this page in <strong style="color:var(--muted)">two browser tabs</strong> — one per view.<br>
+    Both stay in sync automatically via shared browser storage.
+  </div>
+</div>
+
+<!-- ══ FACILITATOR VIEW ══ -->
+<div id="facView">
+
+  <header class="topbar">
+    <div class="tb-brand">KPI Workshop</div>
+    <div class="tb-sep"></div>
+    <div class="tb-subtitle">Facilitator Dashboard</div>
+    <div class="tb-right">
+      <div class="live-dot"></div>
+      <div class="session-badge" id="sessionBadge">Session ready</div>
+      <button class="btn-top btn-teal" onclick="launchMode('proj')">📺 Open Projector</button>
+      <button class="btn-top btn-ghost" onclick="openModal('sessionMod')">⚙ Session</button>
+      <button class="btn-top btn-gold" onclick="showToast('Saved ✓')">💾 Save</button>
+    </div>
+  </header>
+
+  <nav class="sidebar">
+    <div class="sidebar-sec">
+      <div class="sb-lbl">Workshop Blocks</div>
+      <div id="blockNav"></div>
+    </div>
+    <div class="sidebar-sec" style="border-bottom:none;">
+      <div class="sb-lbl">Total Elapsed</div>
+      <div style="padding:0 16px;">
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:7px;">
+          <span id="totalElapsed" style="color:var(--gold)">0:00</span> &nbsp;/&nbsp; 4:00:00
+        </div>
+        <div style="height:3px;background:var(--dim);border-radius:2px;overflow:hidden;">
+          <div id="totalFill" style="height:100%;background:linear-gradient(90deg,var(--gold),var(--teal));border-radius:2px;width:0%;transition:width .5s;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sb-foot">
+      <div class="sb-prog-lbl">Workshop Completion</div>
+      <div class="sb-prog-bar"><div class="sb-prog-fill" id="overallFill" style="width:0%"></div></div>
+      <div class="sb-prog-pct" id="overallPct">0%</div>
+    </div>
+  </nav>
+
+  <main class="main" id="mainContent"></main>
+
+  <aside class="aside">
+    <div class="aside-tabs">
+      <div class="aside-tab active" onclick="switchTab(this,'participants')">Participants</div>
+      <div class="aside-tab" onclick="switchTab(this,'notes')">Notes</div>
+      <div class="aside-tab" onclick="switchTab(this,'agenda')">Agenda</div>
+    </div>
+    <div class="aside-body">
+
+      <div class="aside-panel active" id="tab-participants">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Participants</div></div>
+          <div class="stat-card"><div class="stat-val" id="statOnTrack" style="color:var(--green)">0</div><div class="stat-lbl">On Track</div></div>
+        </div>
+        <div class="p-add">
+          <input type="text" id="pInput" placeholder="Name — Dept" onkeydown="if(event.key==='Enter')addParticipant()">
+          <button onclick="addParticipant()">+ Add</button>
+        </div>
+        <div id="pList"><div class="empty-st"><div class="empty-ico">👤</div>Add participants above to track their progress.</div></div>
+      </div>
+
+      <div class="aside-panel" id="tab-notes">
+        <div class="sec-lbl">Session Notes</div>
+        <textarea class="notes-ta" id="notesArea" placeholder="Observations, issues, insights, follow-up actions..." oninput="saveNotes()"></textarea>
+        <div class="notes-ts" id="notesTs">Not saved yet</div>
+        <div class="sec-lbl" style="margin-top:14px;">Quick Actions</div>
+        <button class="qa-btn" onclick="stampNote()"><span class="qa-icon">📍</span>Stamp time + block</button>
+        <button class="qa-btn" onclick="actionNote()"><span class="qa-icon">⚡</span>Log follow-up action</button>
+        <button class="qa-btn" onclick="copyNotes()"><span class="qa-icon">📋</span>Copy notes to clipboard</button>
+        <button class="qa-btn" onclick="clearNotes()"><span class="qa-icon">🗑</span>Clear all notes</button>
+      </div>
+
+      <div class="aside-panel" id="tab-agenda">
+        <div class="sec-lbl">Jump to Block</div>
+        <div id="agendaMini"></div>
+        <div class="sec-lbl" style="margin-top:14px;">Outcomes</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+          ✦ Self-designed KPI scorecard per SCM function<br>
+          ✦ Clear baselines and targets with 1–5 ratings<br>
+          ✦ Ownership of KPIs tied to procurement, inventory, logistics &amp; supplier management
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+</div><!-- /facView -->
+
+<!-- ══ PROJECTOR VIEW ══ -->
+<div id="projView">
+  <button class="proj-back-btn" onclick="launchMode('fac')">← Facilitator View</button>
+  <div class="proj-topbar">
+    <div class="proj-brand">Supply Chain KPI Workshop</div>
+    <div class="proj-block-indicator" id="projDots"></div>
+    <div class="proj-period" id="projPeriod"></div>
+  </div>
+  <div class="proj-body">
+    <div class="proj-left">
+      <div class="proj-eyebrow" id="projEyebrow">Block 1</div>
+      <div class="proj-title" id="projTitle">Opening &amp; Context</div>
+      <ul class="proj-activities" id="projActivities"></ul>
+    </div>
+    <div class="proj-right">
+      <div class="proj-timer-ring">
+        <svg viewBox="0 0 200 200" width="200" height="200">
+          <circle class="track" cx="100" cy="100" r="90"/>
+          <circle class="fill" id="projRingFill" cx="100" cy="100" r="90"/>
+        </svg>
+        <div class="proj-timer-inner">
+          <div class="proj-timer" id="projTimerDisplay">--:--</div>
+          <div class="proj-timer-lbl" id="projTimerLbl">Timer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="proj-status-bar">
+    <div class="proj-status-left" id="projStatusLeft">Waiting for facilitator to start</div>
+    <div class="proj-status-right" id="projStatusRight"></div>
+  </div>
+</div>
+
+<!-- modals -->
+<div class="modal-ov" id="sessionMod" onclick="if(event.target===this)closeModal('sessionMod')">
+  <div class="modal-box">
+    <div class="modal-title">Session Settings</div>
+    <div class="modal-sub">Configure this workshop session.</div>
+    <input class="modal-inp" id="modSessName" placeholder="Session name (e.g. Cohort 1 — June 2025)">
+    <input class="modal-inp" id="modFacName" placeholder="Facilitator name">
+    <input class="modal-inp" id="modOrg" placeholder="Organisation / Client">
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal('sessionMod')">Cancel</button>
+      <button class="modal-confirm" onclick="saveSession()">Save</button>
+    </div>
+  </div>
+</div>
+<div class="modal-ov" id="flagMod" onclick="if(event.target===this)closeModal('flagMod')">
+  <div class="modal-box">
+    <div class="modal-title">Flag Participant</div>
+    <div class="modal-sub" id="flagSub">Add a follow-up note.</div>
+    <input class="modal-inp" id="flagInp" placeholder="e.g. Needs help with formula..." onkeydown="if(event.key==='Enter')confirmFlag()">
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal('flagMod')">Cancel</button>
+      <button class="modal-confirm" onclick="confirmFlag()">Flag</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+// DATA
+// ══════════════════════════════════
+const BLOCKS=[
+  {id:1,title:"Opening & Context",duration:30,eyebrow:"Block 1 — Foundation",sub:"30 min · Connecting roles to company success",color:"#c9a84c",
+   script:`"Welcome, everyone. Today's workshop is about making KPIs <strong>real</strong> for your department. KPIs aren't just numbers — they're the story of how your work contributes to the company's success. By the end of this session, you'll have KPIs that <em>you</em> designed yourselves, grounded in procurement, inventory, logistics, and supplier management."`,
+   activities:["Ask participants to open their workbook and complete the cover page.","Activity: Write one sentence — 'What does success look like in your supply chain role?'","Give 3 minutes writing time, then invite 3–4 participants to share.","Acknowledge responses and link back to the workshop purpose."],
+   tips:["If energy is low, open with a show-of-hands question to warm up the room.","Keep this block conversational — set a warm, psychologically safe tone.","Note anyone who seems uncertain — they may need extra support in Block 4."]},
+  {id:2,title:"Strategic Alignment",duration:45,eyebrow:"Block 2 — Layers 1–3",sub:"45 min · Connecting department work to strategic goals",color:"#3ab8c8",
+   script:`"Our KPIs must connect to the bigger picture. <strong>Strategic objectives</strong> are the company's destination. <strong>Department objectives</strong> are the route your team takes. <strong>Functional objectives</strong> are the steps each person takes. Every KPI you build must trace back to this hierarchy."`,
+   activities:["Write one Strategic Objective your department supports.","Write one Department Objective that connects to it.","Write one Functional Objective — your team's day-to-day priority.","Share your department objective with your table group."],
+   tips:["Walk through the alignment example table in the workbook — do the procurement row together.","Probe: 'If this objective disappeared tomorrow, what would the company lose?'","If groups are stuck, suggest they think about their most recent quarterly review targets."]},
+  {id:3,title:"Success Indicators",duration:45,eyebrow:"Block 3 — Layer 5",sub:"45 min · Describing what success looks like before measuring it",color:"#5ec98a",
+   script:`"Success indicators are like dashboard lights in a car — they tell you something important is happening, but not yet <em>how much</em> or <em>how often</em>. 'Supplier reliability' is an indicator — it doesn't yet give us a number. Indicators are the bridge between objectives and KPIs."`,
+   activities:["List 2–3 Success Indicators for your department.","Complete both columns: what 'improving' looks like, and observable evidence.","Group discussion: 'How would you know if this indicator is improving?'","Answer the reflection prompt about invisible work in your team."],
+   tips:["Push for specificity: 'Can you describe that without using the word better?'","Common mistake: participants write KPIs here. Redirect them — hold it for Block 4.","The reflection prompt often unlocks great hidden indicators — give it 2 full minutes."]},
+  {id:4,title:"Converting Indicators into KPIs",duration:60,eyebrow:"Block 4 — The Core Build",sub:"60 min · Writing definitions, formulas and performance standards",color:"#a06fd4",
+   script:`"Now let's turn indicators into KPIs. 'Inventory accuracy' becomes <strong>'% variance between system and physical count.'</strong> KPIs give us clarity — they remove guesswork. Today you'll write the definition, the formula, and define what each performance rating from 1 to 5 looks like for your specific context."`,
+   activities:["For each success indicator, complete a KPI template in your workbook.","Write a clear Definition — 'What exactly does this KPI measure?'","Write the Formula / Calculation — 'How is this number produced?'","Define all 5 performance standard ratings with specific thresholds."],
+   tips:["This is the highest cognitive-load block — circulate constantly.","Common issue: vague definitions like 'measures performance.' Push for specificity.","If stuck on formula: 'What data already exists in your system that relates to this?'","Move discussion forward at 45 min — ratings can be completed individually."]},
+  {id:5,title:"Baselines & Targets",duration:30,eyebrow:"Block 5 — Calibration",sub:"30 min · Setting current state and 1–5 rating thresholds",color:"#d4923a",
+   script:`"<strong>Baseline</strong> is where you are today; <strong>target</strong> is where you want to be. Think of the 1–5 rating scale as a ladder. Rating 3 is the minimum acceptable standard. Ratings 4 and 5 are stretch goals that show excellence."`,
+   activities:["Return to KPI templates and confirm the Baseline — current actual performance.","Define the Target for Rating 3 — the minimum acceptable standard.","Complete the Baseline & Target quick-reference summary table.","Answer the reflection prompt: explain your Rating 3 standard in one sentence."],
+   tips:["Baselines are often unknown — encourage estimates where exact data isn't available.","Watch for targets that are too ambitious: 'What evidence shows 95% is achievable?'","The Rating 3 plain-language prompt is powerful — ask 2–3 people to share aloud."]},
+  {id:6,title:"Department KPI Scorecard",duration:20,eyebrow:"Block 6 — Assembly",sub:"20 min · Completing the key deliverable",color:"#4f8bc8",
+   script:`"Now put everything together into a KPI scorecard — your department's <strong>performance mirror</strong>. The scorecard in your workbook is pre-filled from your earlier work. Complete any gaps and confirm each row is done."`,
+   activities:["Open your workbook to Block 6 — the Department KPI Scorecard.","Review pre-filled fields and complete any remaining gaps.","Ensure every row has: Name → Definition → Formula → Baseline → Target → Rating.","Download your PDF — this is your key deliverable to take back to your team."],
+   tips:["Circulate and check that every scorecard has at least 2 completed KPI rows.","Remind participants: 'This PDF goes back to your department — make it presentable.'","If someone finishes early, ask them to add a 4th or 5th KPI."]},
+  {id:7,title:"Gallery Walk & Commitments",duration:20,eyebrow:"Block 7 — Close",sub:"20 min · Sharing, feedback, and committing to action",color:"#c84f4f",
+   script:`"Walk around and review each other's scorecards. Ask questions, give feedback, share ideas. Before we close, each group shares <strong>one KPI they will start tracking immediately</strong>. This is your commitment to action."`,
+   activities:["Share your completed workbook / PDF with at least two other participants.","Review others' scorecards and complete your Gallery Walk observation notes.","Leave two pieces of feedback: one strength, one suggestion per scorecard.","Complete the Commitment to Action section — sign and date it."],
+   tips:["Energise the room — stand up, move around, celebrate the work done today.","Close the commitment loop: 'Your signature is your contract with your team.'","End on time — a strong close matters as much as a strong open."]},
+];
+
+const AV_COLORS=['#c9a84c','#3ab8c8','#5ec98a','#a06fd4','#d4923a','#4f8bc8','#c84f4f','#e87c4f'];
+const SYNC_KEY='kpi_fac_sync';
+const SAVE_KEY='kpi_fac_save';
+
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+let currentMode='';
+let currentBlock=0;
+let timerSecs=0;
+let timerDur=0;
+let timerRunning=false;
+let timerInterval=null;
+let totalSecs=0;
+let totalInterval=null;
+let participants=[];
+let flagTarget=null;
+let session={name:'',fac:'',org:''};
+
+// ══════════════════════════════════
+// MODE SWITCHING
+// ══════════════════════════════════
+function launchMode(mode){
+  currentMode=mode;
+  document.getElementById('modeScreen').style.display='none';
+  if(mode==='fac'){
+    document.getElementById('facView').classList.add('active');
+    document.getElementById('projView').classList.remove('active');
+    initFac();
+  } else {
+    document.getElementById('projView').classList.add('active');
+    document.getElementById('facView').classList.remove('active');
+    initProj();
+  }
+}
+
+// ══════════════════════════════════
+// FACILITATOR INIT
+// ══════════════════════════════════
+function initFac(){
+  loadState();
+  renderBlockNav();
+  renderAgendaMini();
+  renderBlock(currentBlock);
+  renderParticipants();
+  updateOverall();
+  startTotalTimer();
+  setDate();
+}
+
+function setDate(){
+  const d=new Date();
+  const s=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('projPeriod').textContent=s;
+}
+
+// ══════════════════════════════════
+// BLOCK NAV
+// ══════════════════════════════════
+function renderBlockNav(){
+  document.getElementById('blockNav').innerHTML=BLOCKS.map((b,i)=>{
+    let sc='s-up',sl='Upcoming',ic='';
+    if(i<currentBlock){sc='s-done';sl='Done';ic='done';}
+    if(i===currentBlock){sc='s-act';sl='Active';ic='active';}
+    return `<div class="bni ${ic}" onclick="goBlock(${i})">
+      <div class="bni-n">${i<currentBlock?'✓':b.id}</div>
+      <div class="bni-t"><div class="bni-title">${b.title}</div><div class="bni-meta">${b.duration} min</div></div>
+      <span class="bni-s ${sc}">${sl}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderAgendaMini(){
+  document.getElementById('agendaMini').innerHTML=BLOCKS.map((b,i)=>`
+    <div class="ag-row ${i===currentBlock?'cur':''}" onclick="goBlock(${i})">
+      <div class="ag-dot" style="background:${b.color}"></div>
+      <div class="ag-name">${b.title}</div>
+      <div class="ag-time">${b.duration}m</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════
+// RENDER BLOCK (facilitator)
+// ══════════════════════════════════
+function renderBlock(idx){
+  const b=BLOCKS[idx];
+  timerDur=b.duration*60;
+  resetTimer(false);
+  syncState();
+
+  const pd=idx===0?'disabled style="opacity:.3;pointer-events:none;"':'';
+  const nd=idx===BLOCKS.length-1?'disabled style="opacity:.3;pointer-events:none;"':'';
+  const nl=idx===BLOCKS.length-1?'Workshop Complete ✦':`Next: ${BLOCKS[idx+1].title} →`;
+
+  document.getElementById('mainContent').innerHTML=`
+    <div class="block-hero">
+      <div class="bh-accent" style="background:${b.color}"></div>
+      <div class="bh-eyebrow">${b.eyebrow}</div>
+      <div class="bh-title">${b.title}</div>
+      <div class="bh-sub">${b.sub}</div>
+      <div class="timer-row">
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Block Timer</div>
+          <div class="timer-big" id="timerDisp">${fmt(timerDur)}</div>
+        </div>
+        <div class="timer-right">
+          <div class="timer-prog"><div class="timer-prog-fill" id="timerFill" style="width:100%"></div></div>
+          <div class="timer-btns">
+            <button class="btn-tm btn-start" id="btnStart" onclick="startTimer()">▶ Start</button>
+            <button class="btn-tm btn-pause" id="btnPause" onclick="pauseTimer()">⏸ Pause</button>
+            <button class="btn-tm btn-reset" onclick="resetTimer(true)">↺ Reset</button>
+            <button class="btn-tm btn-ext" onclick="extendTimer(5)">+5m</button>
+            <button class="btn-tm btn-ext" onclick="extendTimer(10)">+10m</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel script-panel">
+      <div class="panel-lbl script-lbl">Facilitator Script</div>
+      <div class="script-text">${b.script}</div>
+    </div>
+    <div class="panel">
+      <div class="panel-lbl act-lbl">Activity Instructions for Participants</div>
+      <ul class="act-list">${b.activities.map(a=>`<li>${a}</li>`).join('')}</ul>
+    </div>
+    <div class="panel tips-panel">
+      <div class="panel-lbl tips-lbl">Facilitator Tips</div>
+      <ul class="tips-list">${b.tips.map(t=>`<li>${t}</li>`).join('')}</ul>
+    </div>
+    <div class="nav-row">
+      <button class="btn-nav btn-prev-blk" ${pd} onclick="goBlock(${idx-1})">← Previous</button>
+      <button class="btn-nav btn-next-blk" ${nd} onclick="advance()">${nl}</button>
+    </div>`;
+}
+
+// ══════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════
+function goBlock(idx){
+  if(idx<0||idx>=BLOCKS.length)return;
+  stopTimer();
+  currentBlock=idx;
+  renderBlock(idx);
+  renderBlockNav();
+  renderAgendaMini();
+  updateOverall();
+  saveState();
+}
+
+function advance(){
+  if(currentBlock<BLOCKS.length-1){
+    goBlock(currentBlock+1);
+    showToast(`Block ${currentBlock} — ${BLOCKS[currentBlock].title}`);
+  }
+}
+
+// ══════════════════════════════════
+// TIMER (facilitator)
+// ══════════════════════════════════
+function fmt(s){return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
+
+function startTimer(){
+  if(timerRunning)return;
+  timerRunning=true;
+  document.getElementById('btnStart').style.display='none';
+  document.getElementById('btnPause').style.display='';
+  timerInterval=setInterval(tick,1000);
+  syncState();
+}
+
+function pauseTimer(){
+  timerRunning=false;
+  clearInterval(timerInterval);
+  document.getElementById('btnStart').style.display='';
+  document.getElementById('btnPause').style.display='none';
+  syncState();
+}
+
+function stopTimer(){
+  timerRunning=false;
+  clearInterval(timerInterval);
+  timerInterval=null;
+}
+
+function resetTimer(rerender){
+  stopTimer();
+  timerSecs=timerDur;
+  syncState();
+  if(rerender!==false){
+    const d=document.getElementById('timerDisp');
+    const f=document.getElementById('timerFill');
+    const bs=document.getElementById('btnStart');
+    const bp=document.getElementById('btnPause');
+    if(d){d.textContent=fmt(timerSecs);d.className='timer-big';}
+    if(f){f.style.width='100%';f.className='timer-prog-fill';}
+    if(bs)bs.style.display='';
+    if(bp)bp.style.display='none';
+  }
+}
+
+function tick(){
+  if(timerSecs<=0){stopTimer();showToast(`⏰ Time up — ${BLOCKS[currentBlock].title}`);syncState();return;}
+  timerSecs--;
+  syncState();
+  const d=document.getElementById('timerDisp');
+  const f=document.getElementById('timerFill');
+  if(!d||!f)return;
+  const pct=(timerSecs/timerDur)*100;
+  d.textContent=fmt(timerSecs);
+  f.style.width=pct+'%';
+  if(timerSecs<=120){d.className='timer-big danger';f.className='timer-prog-fill danger';}
+  else if(timerSecs<=300){d.className='timer-big warn';f.className='timer-prog-fill warn';}
+  else{d.className='timer-big';f.className='timer-prog-fill';}
+}
+
+function extendTimer(m){
+  timerDur+=m*60;timerSecs+=m*60;
+  const d=document.getElementById('timerDisp');
+  if(d)d.textContent=fmt(timerSecs);
+  syncState();
+  showToast(`+${m} min added`);
+}
+
+// ══════════════════════════════════
+// TOTAL TIMER
+// ══════════════════════════════════
+function startTotalTimer(){
+  totalInterval=setInterval(()=>{
+    totalSecs++;
+    const h=Math.floor(totalSecs/3600),m=Math.floor((totalSecs%3600)/60),s=totalSecs%60;
+    const lbl=h>0?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`;
+    const el=document.getElementById('totalElapsed');
+    if(el)el.textContent=lbl;
+    const pct=Math.min(100,(totalSecs/14400)*100);
+    const f=document.getElementById('totalFill');
+    if(f)f.style.width=pct+'%';
+  },1000);
+}
+
+// ══════════════════════════════════
+// OVERALL PROGRESS
+// ══════════════════════════════════
+function updateOverall(){
+  const pct=Math.round((currentBlock/BLOCKS.length)*100);
+  document.getElementById('overallFill').style.width=pct+'%';
+  document.getElementById('overallPct').textContent=pct+'%';
+}
+
+// ══════════════════════════════════
+// PARTICIPANTS
+// ══════════════════════════════════
+function addParticipant(){
+  const inp=document.getElementById('pInput');
+  const raw=inp.value.trim();if(!raw)return;
+  const parts=raw.split('—').map(s=>s.trim());
+  const name=parts[0],dept=parts[1]||'';
+  const initials=name.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+  const color=AV_COLORS[participants.length%AV_COLORS.length];
+  participants.push({id:Date.now(),name,dept,initials,color,progress:0,flagged:false,flagNote:''});
+  inp.value='';
+  renderParticipants();
+  saveState();
+  showToast(`${name} added`);
+}
+
+function renderParticipants(){
+  document.getElementById('statTotal').textContent=participants.length;
+  document.getElementById('statOnTrack').textContent=participants.filter(p=>p.progress>=currentBlock).length;
+  const c=document.getElementById('pList');
+  if(!participants.length){c.innerHTML=`<div class="empty-st"><div class="empty-ico">👤</div>Add participants above.</div>`;return;}
+  c.innerHTML=participants.map(p=>{
+    const pct=Math.round((p.progress/BLOCKS.length)*100);
+    const dots=BLOCKS.map((_,i)=>`<div class="p-dot ${i<p.progress?'done':i===p.progress?'cur':''}"></div>`).join('');
+    const fb=p.flagged?'p-btn flag-btn flagged':'p-btn flag-btn';
+    return `<div class="p-card" style="${p.flagged?'border-color:rgba(212,146,58,.4);':''}">
+      <div class="p-card-top">
+        <div class="p-av" style="background:${p.color}">${p.initials}</div>
+        <div style="flex:1"><div class="p-name">${p.name}</div><div class="p-dept">${p.dept||'—'}</div></div>
+        <button onclick="removeP(${p.id})" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:12px;padding:2px 5px;">✕</button>
+      </div>
+      <div class="p-prog"><div class="p-prog-fill" style="width:${pct}%;background:${p.color}"></div></div>
+      <div class="p-prog-lbl"><span>Block ${p.progress}/${BLOCKS.length}</span><span style="color:${p.color}">${pct}%</span></div>
+      <div class="p-dots">${dots}</div>
+      ${p.flagNote?`<div class="p-flag-note">⚑ ${p.flagNote}</div>`:''}
+      <div class="p-acts">
+        <button class="p-btn" onclick="advP(${p.id})">▶ Advance</button>
+        <button class="p-btn" onclick="revP(${p.id})">◀ Revert</button>
+        <button class="${fb}" onclick="openFlagModal(${p.id})">${p.flagged?'🚩 Flagged':'⚑ Flag'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function advP(id){const p=participants.find(x=>x.id===id);if(p&&p.progress<BLOCKS.length){p.progress++;renderParticipants();saveState();}}
+function revP(id){const p=participants.find(x=>x.id===id);if(p&&p.progress>0){p.progress--;renderParticipants();saveState();}}
+function removeP(id){participants=participants.filter(x=>x.id!==id);renderParticipants();saveState();}
+
+// ══════════════════════════════════
+// FLAG
+// ══════════════════════════════════
+function openFlagModal(id){
+  flagTarget=id;
+  const p=participants.find(x=>x.id===id);
+  document.getElementById('flagSub').textContent=`Flagging: ${p.name}`;
+  document.getElementById('flagInp').value=p.flagNote||'';
+  openModal('flagMod');
+  setTimeout(()=>document.getElementById('flagInp').focus(),80);
+}
+function confirmFlag(){
+  const p=participants.find(x=>x.id===flagTarget);
+  if(!p)return;
+  const note=document.getElementById('flagInp').value.trim();
+  p.flagNote=note;p.flagged=!!note;
+  closeModal('flagMod');
+  renderParticipants();
+  saveState();
+  if(note)showToast(`${p.name} flagged`);
+}
+
+// ══════════════════════════════════
+// TABS
+// ══════════════════════════════════
+function switchTab(el,name){
+  document.querySelectorAll('.aside-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.aside-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ══════════════════════════════════
+// NOTES
+// ══════════════════════════════════
+function saveNotes(){
+  localStorage.setItem('fac_notes',document.getElementById('notesArea').value);
+  const now=new Date();
+  document.getElementById('notesTs').textContent=`Saved ${now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`;
+}
+function stampNote(){
+  const a=document.getElementById('notesArea');
+  const now=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  a.value+=`\n\n[${now} — ${BLOCKS[currentBlock].title}]\n`;
+  a.focus();a.scrollTop=a.scrollHeight;saveNotes();
+}
+function actionNote(){
+  const a=document.getElementById('notesArea');
+  const now=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  a.value+=`\n\n[ACTION — ${now}] `;
+  a.focus();a.scrollTop=a.scrollHeight;saveNotes();
+}
+function copyNotes(){
+  const n=document.getElementById('notesArea').value;
+  if(!n){showToast('No notes to copy');return;}
+  navigator.clipboard.writeText(n).then(()=>showToast('Copied ✓'));
+}
+function clearNotes(){
+  if(confirm('Clear all notes?')){
+    document.getElementById('notesArea').value='';
+    localStorage.removeItem('fac_notes');
+    document.getElementById('notesTs').textContent='Cleared';
+  }
+}
+
+// ══════════════════════════════════
+// SESSION
+// ══════════════════════════════════
+function saveSession(){
+  session.name=document.getElementById('modSessName').value.trim();
+  session.fac=document.getElementById('modFacName').value.trim();
+  session.org=document.getElementById('modOrg').value.trim();
+  if(session.name)document.getElementById('sessionBadge').innerHTML=`<div class="live-dot"></div>${session.name}`;
+  closeModal('sessionMod');
+  saveState();
+  showToast('Session saved ✓');
+}
+
+// ══════════════════════════════════
+// MODALS / TOAST
+// ══════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ══════════════════════════════════
+// SYNC — shared via localStorage
+// real-time between tabs
+// ══════════════════════════════════
+function syncState(){
+  const data={
+    currentBlock,
+    timerSecs,timerDur,timerRunning,
+    blockTitle:BLOCKS[currentBlock].title,
+    blockEyebrow:BLOCKS[currentBlock].eyebrow,
+    blockColor:BLOCKS[currentBlock].color,
+    activities:BLOCKS[currentBlock].activities,
+    ts:Date.now()
+  };
+  localStorage.setItem(SYNC_KEY,JSON.stringify(data));
+}
+
+// ══════════════════════════════════
+// SAVE / LOAD full state
+// ══════════════════════════════════
+function saveState(){
+  localStorage.setItem(SAVE_KEY,JSON.stringify({currentBlock,participants,session}));
+  syncState();
+}
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(raw){
+      const s=JSON.parse(raw);
+      currentBlock=s.currentBlock||0;
+      participants=s.participants||[];
+      session=s.session||{name:'',fac:'',org:''};
+      if(session.name){
+        document.getElementById('sessionBadge').innerHTML=`<div class="live-dot"></div>${session.name}`;
+        document.getElementById('modSessName').value=session.name;
+      }
+      if(session.fac)document.getElementById('modFacName').value=session.fac;
+      if(session.org)document.getElementById('modOrg').value=session.org;
+    }
+    const notes=localStorage.getItem('fac_notes');
+    if(notes)document.getElementById('notesArea').value=notes;
+  }catch(e){}
+}
+
+// ══════════════════════════════════
+// PROJECTOR VIEW
+// ══════════════════════════════════
+let projPollInterval=null;
+
+function initProj(){
+  renderProjDots();
+  pollProjector();
+  projPollInterval=setInterval(pollProjector,500);
+}
+
+function renderProjDots(){
+  document.getElementById('projDots').innerHTML=
+    BLOCKS.map((_,i)=>`<div class="proj-blk-dot" id="pdot-${i}"></div>`).join('');
+}
+
+let lastProjTs=0;
+
+function pollProjector(){
+  try{
+    const raw=localStorage.getItem(SYNC_KEY);
+    if(!raw)return;
+    const d=JSON.parse(raw);
+    if(d.ts===lastProjTs)return;
+    lastProjTs=d.ts;
+    updateProjDisplay(d);
+  }catch(e){}
+}
+
+function updateProjDisplay(d){
+  // block info
+  document.getElementById('projEyebrow').textContent=d.blockEyebrow;
+  document.getElementById('projTitle').textContent=d.blockTitle;
+
+  // activities
+  document.getElementById('projActivities').innerHTML=
+    d.activities.map(a=>`<li>${a}</li>`).join('');
+
+  // timer display
+  const disp=document.getElementById('projTimerDisplay');
+  const lbl=document.getElementById('projTimerLbl');
+  const ring=document.getElementById('projRingFill');
+
+  disp.textContent=fmt(d.timerSecs);
+
+  // ring: circumference = 2π×90 ≈ 565.5
+  const circ=2*Math.PI*90;
+  const pct=d.timerDur>0?d.timerSecs/d.timerDur:1;
+  const offset=circ*(1-pct);
+  ring.style.strokeDasharray=circ;
+  ring.style.strokeDashoffset=offset;
+
+  if(d.timerSecs<=120){
+    disp.className='proj-timer danger';
+    ring.style.stroke='#c84f4f';
+    document.getElementById('projStatusLeft').textContent='⏰ Less than 2 minutes remaining';
+  } else if(d.timerSecs<=300){
+    disp.className='proj-timer warn';
+    ring.style.stroke='#d4923a';
+    document.getElementById('projStatusLeft').textContent='⚠ 5 minutes remaining';
+  } else {
+    disp.className='proj-timer';
+    ring.style.stroke=d.blockColor||'#c9a84c';
+    document.getElementById('projStatusLeft').textContent=
+      d.timerRunning?'In progress — working on activities':'Waiting for facilitator';
+  }
+
+  lbl.textContent=d.timerRunning?'Time Remaining':'Timer Paused';
+
+  // dots
+  BLOCKS.forEach((_,i)=>{
+    const dot=document.getElementById('pdot-'+i);
+    if(!dot)return;
+    dot.className='proj-blk-dot'+(i<d.currentBlock?' done':i===d.currentBlock?' cur':'');
+  });
+
+  // status right
+  const elapsed=BLOCKS.slice(0,d.currentBlock).reduce((s,b)=>s+b.duration,0);
+  document.getElementById('projStatusRight').textContent=
+    `Block ${d.currentBlock+1} of ${BLOCKS.length} · ${elapsed} min elapsed`;
+}
+
+// ══════════════════════════════════
+// KEYBOARD
+// ══════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(currentMode!=='fac')return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key===']'||e.key==='ArrowRight')advance();
+  if(e.key==='['||e.key==='ArrowLeft')goBlock(currentBlock-1);
+  if(e.key===' '){e.preventDefault();timerRunning?pauseTimer():startTimer();}
+});
+
+// cleanup on unload
+window.addEventListener('beforeunload',()=>{
+  clearInterval(projPollInterval);
+  clearInterval(totalInterval);
+  clearInterval(timerInterval);
+});
+</script>
+</body>
+</html>
