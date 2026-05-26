@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supply Chain KPI Workshop — Participants' Workbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── SCREEN STYLES ── */
+:root {
+  --navy:   #1B3A5C;
+  --teal:   #2E7D9A;
+  --teal-lt:#EAF4F9;
+  --gold:   #C9A84C;
+  --gold-lt:#FDF8EE;
+  --ink:    #1a1a2e;
+  --body:   #3d3d3d;
+  --muted:  #6b7280;
+  --rule:   #d1d5db;
+  --bg:     #f8f7f4;
+  --white:  #ffffff;
+  --green:  #1a6b4a;
+  --green-lt:#edf7f3;
+  --red-lt: #fdf2f2;
+  --red:    #b91c1c;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--body);
+  line-height: 1.6;
+}
+
+/* ── STICKY TOOLBAR ── */
+.toolbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 56px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+}
+.toolbar-left { display: flex; align-items: center; gap: 16px; }
+.toolbar-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+.toolbar-subtitle {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-left: 1px solid rgba(255,255,255,0.2);
+  padding-left: 16px;
+}
+.toolbar-right { display: flex; align-items: center; gap: 10px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s ease;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--gold);
+  color: var(--navy);
+}
+.btn-primary:hover { background: #d4b05a; transform: translateY(-1px); }
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.85);
+}
+.btn-outline:hover { border-color: rgba(255,255,255,0.7); color: #fff; }
+
+/* progress bar */
+.progress-wrap {
+  position: fixed;
+  top: 56px; left: 0; right: 0;
+  z-index: 99;
+  height: 3px;
+  background: rgba(0,0,0,0.08);
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), #e8c96a);
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+/* ── LAYOUT ── */
+.page-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 84px 40px 80px;
+}
+
+/* ── COVER ── */
+.cover {
+  background: var(--navy);
+  border-radius: 16px;
+  padding: 56px 56px 48px;
+  margin-bottom: 48px;
+  position: relative;
+  overflow: hidden;
+}
+.cover::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: rgba(201,168,76,0.08);
+}
+.cover::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; left: 40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(46,125,154,0.12);
+}
+.cover-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.cover-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+.cover-sub {
+  font-size: 16px;
+  color: rgba(255,255,255,0.6);
+  font-style: italic;
+  margin-bottom: 40px;
+}
+.cover-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+.cover-field label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 5px;
+}
+.cover-field input {
+  width: 100%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 6px;
+  padding: 10px 14px;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s, background 0.2s;
+}
+.cover-field input::placeholder { color: rgba(255,255,255,0.25); }
+.cover-field input:focus {
+  border-color: var(--gold);
+  background: rgba(255,255,255,0.12);
+}
+
+/* ── HOW TO USE BOX ── */
+.how-to-box {
+  background: var(--gold-lt);
+  border: 1.5px solid #e8d08a;
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin-bottom: 48px;
+}
+.how-to-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  color: var(--navy);
+  margin-bottom: 12px;
+}
+.how-to-box ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.how-to-box ul li {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  color: #5a4a1a;
+}
+.how-to-box ul li::before {
+  content: '→';
+  color: var(--gold);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── BLOCK SECTIONS ── */
+.block-section {
+  margin-bottom: 52px;
+  scroll-margin-top: 80px;
+}
+.block-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid var(--teal);
+}
+.block-num {
+  background: var(--navy);
+  color: var(--gold);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 11px;
+  border-radius: 20px;
+  white-space: nowrap;
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
+.block-header-text h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  color: var(--navy);
+  margin-bottom: 3px;
+}
+.block-header-text .block-time {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--teal);
+  text-transform: uppercase;
+}
+
+.facilitator-note {
+  background: var(--teal-lt);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: #1d4e63;
+  font-style: italic;
+  line-height: 1.65;
+}
+
+/* activity box */
+.activity-box {
+  background: #eff7f9;
+  border: 1.5px solid #b3d9e8;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+}
+.activity-box-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-weight: 500;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.activity-box-title::before {
+  content: '';
+  display: block;
+  width: 14px;
+  height: 1.5px;
+  background: var(--teal);
+}
+.activity-box ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.activity-box ul li {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  color: #1d4e63;
+  line-height: 1.55;
+}
+.activity-box ul li::before {
+  content: '▸';
+  color: var(--teal);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* reflection prompt */
+.prompt-box {
+  background: var(--gold-lt);
+  border: 1.5px solid #e0c87a;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.prompt-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.prompt-box p {
+  font-size: 13px;
+  color: #6b4c10;
+  font-style: italic;
+  line-height: 1.6;
+}
+.prompt-box strong { color: var(--navy); font-style: normal; font-weight: 600; }
+
+/* ── FORM ELEMENTS ── */
+.field-group { margin-bottom: 20px; }
+.field-group label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--navy);
+  font-weight: 500;
+  margin-bottom: 7px;
+}
+.field-group textarea,
+.field-group input[type="text"] {
+  width: 100%;
+  border: 1.5px solid var(--rule);
+  border-radius: 7px;
+  padding: 12px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--white);
+  outline: none;
+  resize: vertical;
+  transition: border 0.2s, box-shadow 0.2s;
+  line-height: 1.6;
+}
+.field-group textarea { min-height: 80px; }
+.field-group textarea:focus,
+.field-group input[type="text"]:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(46,125,154,0.1);
+}
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+/* ── TABLES ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+.data-table thead th {
+  background: var(--navy);
+  color: #fff;
+  font-family: 'DM Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 10px 13px;
+  text-align: left;
+  font-weight: 500;
+}
+.data-table thead th:first-child { border-radius: 6px 0 0 0; }
+.data-table thead th:last-child  { border-radius: 0 6px 0 0; }
+.data-table tbody tr:nth-child(even) td { background: #f5f8fa; }
+.data-table tbody td {
+  padding: 9px 13px;
+  border-bottom: 1px solid #e5e9ec;
+  vertical-align: top;
+  background: var(--white);
+}
+.data-table tbody td.label-col {
+  font-weight: 600;
+  color: var(--navy);
+  white-space: nowrap;
+  background: #f0f5f8;
+  font-size: 12px;
+}
+.data-table td.formula-cell {
+  font-family: 'DM Mono', monospace;
+  font-size: 11.5px;
+  color: #1d4e63;
+}
+.data-table td input[type="text"],
+.data-table td textarea {
+  width: 100%;
+  border: 1px solid #dde3e8;
+  border-radius: 5px;
+  padding: 7px 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: transparent;
+  outline: none;
+  resize: none;
+  transition: border 0.18s;
+}
+.data-table td input[type="text"]:focus,
+.data-table td textarea:focus {
+  border-color: var(--teal);
+  background: var(--white);
+}
+
+/* ── REFERENCE TABLE ── */
+.ref-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+.ref-table th {
+  background: var(--navy);
+  color: #fff;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  text-align: left;
+}
+.ref-table th:first-child { border-radius: 6px 0 0 0; }
+.ref-table th:last-child  { border-radius: 0 6px 0 0; }
+.ref-table td { padding: 10px 14px; border-bottom: 1px solid #e5e9ec; vertical-align: middle; }
+.r-num-cell {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  width: 48px;
+}
+.r-label-cell { font-weight: 600; width: 160px; }
+
+/* rating rows */
+.r1 td { background: #fff5f5; } .r1 .r-num-cell { color: #b91c1c; } .r1 .r-label-cell { color: #b91c1c; }
+.r2 td { background: #fff9ee; } .r2 .r-num-cell { color: #b45309; } .r2 .r-label-cell { color: #b45309; }
+.r3 td { background: #fdfbee; } .r3 .r-num-cell { color: #92740a; } .r3 .r-label-cell { color: #92740a; }
+.r4 td { background: #eef6fb; } .r4 .r-num-cell { color: #1a5c7a; } .r4 .r-label-cell { color: #1a5c7a; }
+.r5 td { background: #edf7f3; } .r5 .r-num-cell { color: #1a6b4a; } .r5 .r-label-cell { color: #1a6b4a; }
+
+/* ── KPI TEMPLATE CARD ── */
+.kpi-card {
+  border: 2px solid var(--teal);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.kpi-card-header {
+  background: var(--navy);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.kpi-card-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  color: #fff;
+}
+.kpi-card-header span {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+}
+.kpi-card-body { padding: 22px; background: var(--white); }
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* rating definition table inside KPI card */
+.rating-def-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+.rating-def-table th {
+  background: #e8f3f8;
+  color: var(--navy);
+  font-family: 'DM Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 8px 11px;
+  text-align: left;
+}
+.rating-def-table td { padding: 8px 11px; border-bottom: 1px solid #e8ecef; vertical-align: middle; }
+.rating-def-table tr:last-child td { border-bottom: none; }
+.rating-def-table td.rn {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  width: 40px;
+}
+.rating-def-table td.rl { font-weight: 600; font-size: 11px; width: 130px; }
+.rating-def-table td input[type="text"] {
+  width: 100%;
+  border: 1px solid #dde3e8;
+  border-radius: 4px;
+  padding: 6px 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--ink);
+  background: transparent;
+  outline: none;
+  transition: border 0.18s;
+}
+.rating-def-table td input[type="text"]:focus { border-color: var(--teal); background: #fff; }
+.rd1 td { background: #fff8f8; } .rd1 .rn { color: #b91c1c; } .rd1 .rl { color: #b91c1c; }
+.rd2 td { background: #fffbf2; } .rd2 .rn { color: #b45309; } .rd2 .rl { color: #b45309; }
+.rd3 td { background: #fdfbee; } .rd3 .rn { color: #92740a; } .rd3 .rl { color: #92740a; }
+.rd4 td { background: #f0f8fc; } .rd4 .rn { color: #1a5c7a; } .rd4 .rl { color: #1a5c7a; }
+.rd5 td { background: #f0fbf5; } .rd5 .rn { color: #1a6b4a; } .rd5 .rl { color: #1a6b4a; }
+
+/* ── ALIGNMENT TABLE ── */
+.align-example {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+.align-example th {
+  background: var(--teal);
+  color: #fff;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  text-align: left;
+}
+.align-example th:first-child { border-radius: 6px 0 0 0; }
+.align-example th:last-child  { border-radius: 0 6px 0 0; }
+.align-example td {
+  padding: 9px 14px;
+  border-bottom: 1px solid #e0eaed;
+  vertical-align: top;
+}
+.align-example tr:nth-child(even) td { background: #f4f9fc; }
+
+/* ── GALLERY WALK TABLE ── */
+.gallery-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+.gallery-table th {
+  background: var(--navy);
+  color: #fff;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 10px 13px;
+  text-align: left;
+}
+.gallery-table td {
+  border-bottom: 1px solid #e5e9ec;
+  padding: 4px;
+  background: var(--white);
+}
+.gallery-table tr:nth-child(even) td { background: #f8fafb; }
+
+/* ── SCORECARD ── */
+.scorecard-wrap {
+  border: 2px solid var(--navy);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.scorecard-header {
+  background: var(--navy);
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.scorecard-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: #fff;
+}
+.scorecard-meta { display: flex; gap: 24px; padding: 14px 22px; background: #f0f5f8; }
+.scorecard-meta .meta-field { flex: 1; }
+.scorecard-meta label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.scorecard-meta input {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid var(--rule);
+  background: transparent;
+  padding: 4px 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+}
+.scorecard-table { width: 100%; border-collapse: collapse; }
+.scorecard-table th {
+  background: #e8f0f5;
+  color: var(--navy);
+  font-family: 'DM Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 9px 12px;
+  text-align: left;
+  border-bottom: 1.5px solid #c5d5df;
+}
+.scorecard-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #e8ecef;
+  background: var(--white);
+  vertical-align: middle;
+}
+.scorecard-table tr:nth-child(even) td { background: #f8fafb; }
+.scorecard-table .row-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  width: 34px;
+  font-weight: 500;
+}
+.scorecard-table td input[type="text"] {
+  width: 100%;
+  border: none;
+  border-bottom: 1px dashed #c5cfd8;
+  background: transparent;
+  padding: 5px 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+  transition: border 0.18s;
+}
+.scorecard-table td input[type="text"]:focus {
+  border-bottom-color: var(--teal);
+  background: rgba(46,125,154,0.04);
+}
+
+/* status select */
+.status-select {
+  border: none;
+  border-bottom: 1px dashed #c5cfd8;
+  background: transparent;
+  padding: 5px 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+}
+.status-select:focus { border-bottom-color: var(--teal); }
+
+/* ── COMMITMENT BOX ── */
+.commitment-box {
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 30px 32px;
+  margin-bottom: 28px;
+  background: var(--gold-lt);
+  position: relative;
+}
+.commitment-box::before {
+  content: '✦';
+  position: absolute;
+  top: -14px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold-lt);
+  padding: 0 10px;
+  color: var(--gold);
+  font-size: 18px;
+}
+.commitment-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: var(--navy);
+  text-align: center;
+  margin-bottom: 24px;
+}
+.commitment-field { margin-bottom: 18px; }
+.commitment-field label {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+.commitment-field input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid #d4b05a;
+  background: transparent;
+  padding: 8px 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  transition: border 0.18s;
+}
+.commitment-field input:focus { border-bottom-color: var(--navy); }
+.sig-row { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 8px; }
+
+/* takeaways */
+.takeaways-section { margin-bottom: 52px; }
+
+/* section label */
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--teal);
+  opacity: 0.3;
+}
+
+/* ── PRINT / PDF STYLES ── */
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 18mm 18mm 18mm;
+  }
+
+  .toolbar, .progress-wrap, .btn, #pdf-controls { display: none !important; }
+
+  body { background: #fff; font-size: 11pt; }
+  .page-wrap { padding: 0; max-width: 100%; }
+
+  .cover {
+    background: #1B3A5C !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border-radius: 8px;
+    padding: 36px;
+    margin-bottom: 24pt;
+    break-after: page;
+  }
+  .cover-title { font-size: 28pt; }
+  .cover-fields { margin-top: 20pt; }
+  .cover-field input {
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.5) !important;
+    background: transparent !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .toolbar-logo, .toolbar-subtitle { display: none; }
+
+  .how-to-box {
+    background: #fdf8ee !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border-radius: 6px;
+    margin-bottom: 20pt;
+  }
+
+  .block-section { break-inside: avoid-page; margin-bottom: 24pt; }
+  .block-header { border-bottom: 2px solid #2E7D9A; padding-bottom: 10pt; margin-bottom: 14pt; }
+  .block-header-text h2 { font-size: 18pt; }
+  .block-num {
+    background: #1B3A5C !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .facilitator-note {
+    background: #eaf4f9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border-left: 3px solid #2E7D9A !important;
+    padding: 10pt 14pt;
+    font-size: 10pt;
+  }
+
+  .activity-box {
+    background: #eff7f9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border: 1px solid #b3d9e8 !important;
+    padding: 10pt 14pt;
+  }
+
+  .prompt-box {
+    background: #fdf8ee !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border: 1px solid #e0c87a !important;
+  }
+
+  .kpi-card { break-inside: avoid; border: 1.5px solid #2E7D9A; margin-bottom: 18pt; }
+  .kpi-card-header {
+    background: #1B3A5C !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    padding: 10pt 16pt;
+  }
+  .kpi-card-body { padding: 14pt 16pt; }
+
+  .data-table thead th, .ref-table th, .align-example th,
+  .gallery-table th, .scorecard-table th {
+    background: #1B3A5C !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .rating-def-table th {
+    background: #e8f3f8 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .align-example th { background: #2E7D9A !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .r1 td { background: #fff5f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .r2 td { background: #fff9ee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .r3 td { background: #fdfbee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .r4 td { background: #eef6fb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .r5 td { background: #edf7f3 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .rd1 td { background: #fff8f8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rd2 td { background: #fffbf2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rd3 td { background: #fdfbee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rd4 td { background: #f0f8fc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rd5 td { background: #f0fbf5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .data-table tbody tr:nth-child(even) td,
+  .scorecard-table tr:nth-child(even) td { background: #f5f8fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .scorecard-wrap { break-inside: avoid; border: 1.5px solid #1B3A5C; }
+  .scorecard-header {
+    background: #1B3A5C !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    padding: 10pt 16pt;
+  }
+  .scorecard-meta { background: #f0f5f8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .commitment-box {
+    background: #fdf8ee !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border: 2px solid #C9A84C !important;
+    break-inside: avoid;
+  }
+
+  textarea, input[type="text"] {
+    border: none !important;
+    border-bottom: 1px solid #c0c8d0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    min-height: unset !important;
+  }
+
+  .field-group textarea { min-height: 50pt; }
+
+  h2, h3 { color: #1B3A5C !important; }
+  .section-label { color: #2E7D9A !important; }
+  .data-table tbody td.label-col { background: #f0f5f8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .scorecard-table th { background: #e8f0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #1B3A5C !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOOLBAR ── -->
+<div class="toolbar">
+  <div class="toolbar-left">
+    <div class="toolbar-logo">KPI Workshop</div>
+    <div class="toolbar-subtitle">Participants' Workbook</div>
+  </div>
+  <div class="toolbar-right" id="pdf-controls">
+    <button class="btn btn-outline" onclick="saveProgress()">💾 Save Progress</button>
+    <button class="btn btn-primary" onclick="downloadPDF()">⬇ Download as PDF</button>
+  </div>
+</div>
+
+<!-- progress bar -->
+<div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+<div class="page-wrap">
+
+  <!-- ══ COVER ══ -->
+  <div class="cover">
+    <div class="cover-eyebrow">4-Hour Workshop Series · Supply Chain Management</div>
+    <div class="cover-title">Participants'<br>Workbook</div>
+    <div class="cover-sub">Building KPIs That Drive Real Performance</div>
+    <div class="cover-fields">
+      <div class="cover-field">
+        <label>Participant Name</label>
+        <input type="text" id="cv-name" placeholder="Your full name" oninput="updateProgress()">
+      </div>
+      <div class="cover-field">
+        <label>Department</label>
+        <input type="text" id="cv-dept" placeholder="e.g. Procurement" oninput="updateProgress()">
+      </div>
+      <div class="cover-field">
+        <label>Role / Position</label>
+        <input type="text" id="cv-role" placeholder="e.g. Supply Chain Officer" oninput="updateProgress()">
+      </div>
+      <div class="cover-field">
+        <label>Date</label>
+        <input type="text" id="cv-date" placeholder="Workshop date" oninput="updateProgress()">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HOW TO USE ── -->
+  <div class="how-to-box">
+    <h3>📋 How to use this workbook</h3>
+    <ul>
+      <li>Work through each block in sequence — your facilitator will guide the timing.</li>
+      <li>Type directly into every field. Your responses save automatically in your browser.</li>
+      <li>Click <strong>Download as PDF</strong> at any time to save a formatted copy of your work.</li>
+      <li>The KPI Scorecard (Block 6) is your key deliverable — take it back to your department.</li>
+      <li>Keep this workbook as a living reference — revisit and update as your KPIs evolve.</li>
+    </ul>
+  </div>
+
+  <!-- ══ AGENDA ══ -->
+  <div class="block-section" id="agenda">
+    <div class="section-label">Workshop Overview</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Block</th><th>Topic</th><th>Time</th><th>What you will do</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="label-col">Block 1</td><td>Opening &amp; Context</td><td>30 min</td><td>Connect your role to company success</td></tr>
+        <tr><td class="label-col">Block 2</td><td>Strategic Alignment</td><td>45 min</td><td>Link department objectives to strategic goals</td></tr>
+        <tr><td class="label-col">Block 3</td><td>Success Indicators</td><td>45 min</td><td>Identify what success looks like before measuring it</td></tr>
+        <tr><td class="label-col">Block 4</td><td>Converting Indicators into KPIs</td><td>60 min</td><td>Write definitions, formulas and calculations</td></tr>
+        <tr><td class="label-col">Block 5</td><td>Baselines &amp; Targets</td><td>30 min</td><td>Set your current baseline and 1–5 rating standards</td></tr>
+        <tr><td class="label-col">Block 6</td><td>Department KPI Scorecard</td><td>20 min</td><td>Assemble your completed KPI scorecard</td></tr>
+        <tr><td class="label-col">Block 7</td><td>Gallery Walk &amp; Commitments</td><td>20 min</td><td>Share, receive feedback, commit to one KPI to pilot</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ RATING REFERENCE ══ -->
+  <div class="block-section" id="rating-ref">
+    <div class="section-label">Performance Standard Rating Scale — Reference</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Keep this in view throughout the workshop. <strong style="color:var(--navy)">Rating 3 is your primary target</strong> — the minimum acceptable standard.</p>
+    <table class="ref-table">
+      <thead><tr><th>Rating</th><th>Level</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr class="r1"><td class="r-num-cell">1</td><td class="r-label-cell">Unsatisfactory</td><td>Far below the defined standard. Immediate corrective action required.</td></tr>
+        <tr class="r2"><td class="r-num-cell">2</td><td class="r-label-cell">Developing</td><td>Below standard. An improvement plan is in place or needed.</td></tr>
+        <tr class="r3"><td class="r-num-cell">3</td><td class="r-label-cell">Meets Standard</td><td>Consistently meets the minimum acceptable standard. This is your target.</td></tr>
+        <tr class="r4"><td class="r-num-cell">4</td><td class="r-label-cell">Exceeds Standard</td><td>Above standard. Strong performance demonstrating departmental capability.</td></tr>
+        <tr class="r5"><td class="r-num-cell">5</td><td class="r-label-cell">Outstanding</td><td>Significantly exceeds all standards. Best-in-class or benchmark performance.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ BLOCK 1 ══ -->
+  <div class="block-section" id="block1">
+    <div class="block-header">
+      <div class="block-num">Block 1</div>
+      <div class="block-header-text">
+        <h2>Opening &amp; Context</h2>
+        <div class="block-time">30 minutes</div>
+      </div>
+    </div>
+    <div class="facilitator-note">
+      "KPIs aren't just numbers — they're the story of how your work contributes to the company's success. By the end of this session, you'll have KPIs that you designed yourselves, grounded in procurement, inventory, logistics, and supplier management."
+    </div>
+    <div class="activity-box">
+      <div class="activity-box-title">Activity Instructions</div>
+      <ul>
+        <li>In the space below, write one sentence that describes what success looks like in your supply chain role.</li>
+        <li>Share your sentence with the group and listen to others' responses.</li>
+      </ul>
+    </div>
+    <div class="prompt-box">
+      <span class="prompt-icon">💬</span>
+      <p><strong>Reflection Prompt:</strong> In one sentence, what does success look like in your supply chain role?</p>
+    </div>
+    <div class="field-group">
+      <label>My definition of success in my role</label>
+      <textarea id="b1-success" placeholder="Write your sentence here..." oninput="updateProgress()"></textarea>
+    </div>
+    <div class="field-group">
+      <label>Key responses I heard from the group</label>
+      <textarea id="b1-group" placeholder="Note what stood out from others' responses..." oninput="updateProgress()"></textarea>
+    </div>
+    <div class="section-label" style="margin-top:22px;">Key Points — Why KPIs Matter</div>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--body);margin-bottom:8px;">
+      <li style="display:flex;gap:10px;"><span style="color:var(--teal);flex-shrink:0;font-weight:700;">→</span> KPIs connect daily actions to company-level goals: cash flow, efficiency, client satisfaction.</li>
+      <li style="display:flex;gap:10px;"><span style="color:var(--teal);flex-shrink:0;font-weight:700;">→</span> KPIs remove guesswork — they give clarity and accountability.</li>
+      <li style="display:flex;gap:10px;"><span style="color:var(--teal);flex-shrink:0;font-weight:700;">→</span> The most powerful KPIs are ones you designed yourself.</li>
+      <li style="display:flex;gap:10px;"><span style="color:var(--teal);flex-shrink:0;font-weight:700;">→</span> KPIs are living tools — they evolve as your department grows.</li>
+    </ul>
+    <div class="field-group" style="margin-top:16px;">
+      <label>My notes from Block 1</label>
+      <textarea id="b1-notes" placeholder="Any additional notes or insights..." oninput="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- ══ BLOCK 2 ══ -->
+  <div class="block-section" id="block2">
+    <div class="block-header">
+      <div class="block-num">Block 2</div>
+      <div class="block-header-text">
+        <h2>Strategic Alignment</h2>
+        <div class="block-time">45 minutes</div>
+      </div>
+    </div>
+    <div class="facilitator-note">
+      "Strategic objectives are the company's destination. Department objectives are the route your team takes. Functional objectives are the steps each person takes along that route. Every KPI you build must trace back to this hierarchy."
+    </div>
+    <div class="activity-box">
+      <div class="activity-box-title">Activity Instructions</div>
+      <ul>
+        <li>Write one Strategic Objective your department supports (company-level goal).</li>
+        <li>Write one Department Objective that connects to it.</li>
+        <li>Write one Functional Objective — your team's day-to-day priority that supports the department goal.</li>
+        <li>Share your department objective with your group.</li>
+      </ul>
+    </div>
+
+    <div class="field-group">
+      <label>Strategic Objective — Company Level</label>
+      <textarea id="b2-strategic" placeholder="e.g. Strengthen the company's cash position and reduce working capital waste" oninput="updateProgress()"></textarea>
+    </div>
+    <div class="field-group">
+      <label>Department Objective — How your team contributes</label>
+      <textarea id="b2-dept" placeholder="e.g. Reduce procurement costs by 3% this financial year" oninput="updateProgress()"></textarea>
+    </div>
+    <div class="field-group">
+      <label>Functional Objective — Your team's day-to-day priority</label>
+      <textarea id="b2-functional" placeholder="e.g. Review and renegotiate 5 supplier contracts this quarter" oninput="updateProgress()"></textarea>
+    </div>
+
+    <div class="section-label" style="margin-top:20px;">Alignment Example — Supply Chain</div>
+    <table class="align-example">
+      <thead><tr><th>Strategic Objective</th><th>Department Objective</th><th>Functional Objective</th></tr></thead>
+      <tbody>
+        <tr><td>Stronger cash position</td><td>Reduce procurement costs by 3%</td><td>Renegotiate 5 supplier contracts this quarter</td></tr>
+        <tr><td>Improve operational efficiency</td><td>Achieve ≥95% inventory accuracy</td><td>Conduct weekly stock counts on high-value items</td></tr>
+        <tr><td>Increase client satisfaction</td><td>Deliver ≥95% of orders on time</td><td>Flag delivery risks 48 hours in advance</td></tr>
+      </tbody>
+    </table>
+    <div class="field-group">
+      <label>My notes from Block 2</label>
+      <textarea id="b2-notes" placeholder="Group discussion insights, additional observations..." oninput="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- ══ BLOCK 3 ══ -->
+  <div class="block-section" id="block3">
+    <div class="block-header">
+      <div class="block-num">Block 3</div>
+      <div class="block-header-text">
+        <h2>Success Indicators</h2>
+        <div class="block-time">45 minutes</div>
+      </div>
+    </div>
+    <div class="facilitator-note">
+      "Success indicators are like dashboard lights in a car — they tell you something important is happening, but not yet how much or how often. They are the bridge between objectives and KPIs."
+    </div>
+    <div class="activity-box">
+      <div class="activity-box-title">Activity Instructions</div>
+      <ul>
+        <li>List 2–3 Success Indicators for your department below.</li>
+        <li>For each one, describe what "improving" looks like and what observable evidence you would see.</li>
+        <li>Discuss with your group: "How would you know if this indicator is improving?"</li>
+      </ul>
+    </div>
+    <div class="prompt-box">
+      <span class="prompt-icon">💬</span>
+      <p><strong>Reflection Prompt:</strong> What is one thing your department does that nobody outside your team would notice — until it stopped happening?</p>
+    </div>
+    <div class="field-group">
+      <label>Reflection Response</label>
+      <textarea id="b3-reflect" placeholder="Your answer to the prompt above..." oninput="updateProgress()"></textarea>
+    </div>
+
+    <div class="section-label" style="margin-top:20px;">Success Indicators Table</div>
+    <table class="data-table">
+      <thead>
+        <tr><th style="width:30%">Success Indicator</th><th style="width:35%">What "improving" looks like</th><th style="width:35%">Observable evidence I would see</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="text" id="b3-si1" placeholder="e.g. Supplier reliability" oninput="updateProgress()"></td>
+          <td><input type="text" id="b3-imp1" placeholder="e.g. Fewer urgent order changes" oninput="updateProgress()"></td>
+          <td><input type="text" id="b3-ev1" placeholder="e.g. Delivery variance reports" oninput="updateProgress()"></td>
+        </tr>
+        <tr>
+          <td><input type="text" id="b3-si2" placeholder="e.g. Inventory accuracy" oninput="updateProgress()"></td>
+          <td><input type="text" id="b3-imp2" placeholder="e.g. Fewer stock discrepancies" oninput="updateProgress()"></td>
+          <td><input type="text" id="b3-ev2" placeholder="e.g. Count vs system variance < 1%" oninput="updateProgress()"></td>
+        </tr>
+        <tr>
+          <td><input type="text" id="b3-si3" placeholder="e.g. Logistics timeliness" oninput="updateProgress()"></td>
+          <td><input type="text" id="b3-imp3" placeholder="e.g. More on-time deliveries" oninput="updateProgress()"></td>
+          <td><input type="text" id="b3-ev3" placeholder="e.g. Delivery tracking reports" oninput="updateProgress()"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="field-group">
+      <label>My notes from Block 3</label>
+      <textarea id="b3-notes" placeholder="Group discussion insights..." oninput="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- ══ BLOCK 4 ══ -->
+  <div class="block-section" id="block4">
+    <div class="block-header">
+      <div class="block-num">Block 4</div>
+      <div class="block-header-text">
+        <h2>Converting Indicators into KPIs</h2>
+        <div class="block-time">60 minutes</div>
+      </div>
+    </div>
+    <div class="facilitator-note">
+      "A KPI is a number that tells us if the success indicator is happening. 'Inventory accuracy' becomes '% variance between system and physical count.' KPIs give us clarity — they remove guesswork and create accountability."
+    </div>
+    <div class="activity-box">
+      <div class="activity-box-title">Activity Instructions</div>
+      <ul>
+        <li>For each of your success indicators, complete a KPI template below.</li>
+        <li>Write a clear <strong>Definition</strong> (what exactly does it measure?) and <strong>Formula</strong> (how do you calculate it?).</li>
+        <li>Define what each performance rating (1–5) looks like specifically for your KPI.</li>
+        <li>Discuss: "What evidence output will prove this KPI is being met?"</li>
+      </ul>
+    </div>
+
+    <div class="section-label">Supply Chain KPI Examples — Reference</div>
+    <table class="data-table" style="margin-bottom:24px;">
+      <thead><tr><th>Area</th><th>KPI Name</th><th>Formula</th><th>Baseline</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td class="label-col">Procurement</td><td>% Procurement Savings</td><td class="formula-cell">(Approved Budget − Actual Cost) ÷ Approved Budget × 100</td><td>0–1%</td><td>≥3%</td></tr>
+        <tr><td class="label-col">Inventory</td><td>% Inventory Accuracy</td><td class="formula-cell">(Accurate Items ÷ Total Items Counted) × 100</td><td>~85%</td><td>≥95%</td></tr>
+        <tr><td class="label-col">Logistics</td><td>% On-Time Deliveries</td><td class="formula-cell">(On-Time Deliveries ÷ Total Deliveries) × 100</td><td>70–80%</td><td>≥95%</td></tr>
+        <tr><td class="label-col">Supplier Mgmt</td><td>Supplier Fill Rate</td><td class="formula-cell">(Orders Fully Fulfilled ÷ Total Orders) × 100</td><td>~80%</td><td>≥95%</td></tr>
+      </tbody>
+    </table>
+
+    <!-- KPI 1 -->
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <h3>KPI 1</h3>
+        <span>Complete all fields</span>
+      </div>
+      <div class="kpi-card-body">
+        <div class="field-group">
+          <label>KPI Name *</label>
+          <input type="text" id="k1-name" placeholder="e.g. % On-Time Delivery Rate" oninput="updateProgress();syncScorecard()">
+        </div>
+        <div class="kpi-grid">
+          <div class="field-group">
+            <label>Linked Objective</label>
+            <input type="text" id="k1-obj" placeholder="Which strategic/dept objective does this support?" oninput="updateProgress()">
+          </div>
+          <div class="field-group">
+            <label>Success Indicator</label>
+            <input type="text" id="k1-si" placeholder="Which indicator from Block 3?" oninput="updateProgress()">
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label>Definition — What exactly does this KPI measure? *</label>
+            <textarea id="k1-def" placeholder="e.g. The percentage of customer orders delivered on or before the confirmed delivery date, measured across all dispatch points." oninput="updateProgress()"></textarea>
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label>Formula / Calculation *</label>
+            <textarea id="k1-formula" placeholder="e.g. (Number of on-time deliveries ÷ Total deliveries in period) × 100" style="font-family:'DM Mono',monospace;font-size:13px;" oninput="updateProgress()"></textarea>
+          </div>
+          <div class="field-group">
+            <label>Baseline (Current Performance)</label>
+            <input type="text" id="k1-baseline" placeholder="e.g. 74% last quarter" oninput="updateProgress();syncScorecard()">
+          </div>
+          <div class="field-group">
+            <label>Data Source</label>
+            <input type="text" id="k1-src" placeholder="e.g. WMS / Dispatch logs" oninput="updateProgress()">
+          </div>
+          <div class="field-group">
+            <label>Unit of Measurement</label>
+            <input type="text" id="k1-unit" placeholder="e.g. %" oninput="updateProgress()">
+          </div>
+          <div class="field-group">
+            <label>Review Frequency</label>
+            <input type="text" id="k1-freq" placeholder="e.g. Monthly" oninput="updateProgress()">
+          </div>
+        </div>
+        <div class="section-label" style="margin-top:6px;">Performance Standard Rating (1–5) — Define each level for this KPI</div>
+        <table class="rating-def-table">
+          <thead><tr><th>Rating</th><th>Level</th><th>What this looks like for your KPI — define the specific threshold</th></tr></thead>
+          <tbody>
+            <tr class="rd1"><td class="rn">1</td><td class="rl">Unsatisfactory</td><td><input type="text" id="k1-r1" placeholder="e.g. Below 65% on-time" oninput="updateProgress()"></td></tr>
+            <tr class="rd2"><td class="rn">2</td><td class="rl">Developing</td><td><input type="text" id="k1-r2" placeholder="e.g. 65%–79% on-time" oninput="updateProgress()"></td></tr>
+            <tr class="rd3"><td class="rn">3</td><td class="rl">Meets Standard</td><td><input type="text" id="k1-r3" placeholder="e.g. 80%–94% on-time — minimum acceptable" oninput="updateProgress()"></td></tr>
+            <tr class="rd4"><td class="rn">4</td><td class="rl">Exceeds Standard</td><td><input type="text" id="k1-r4" placeholder="e.g. 95%–98% on-time" oninput="updateProgress()"></td></tr>
+            <tr class="rd5"><td class="rn">5</td><td class="rl">Outstanding</td><td><input type="text" id="k1-r5" placeholder="e.g. ≥99% on-time" oninput="updateProgress()"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- KPI 2 -->
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <h3>KPI 2</h3>
+        <span>Complete all fields</span>
+      </div>
+      <div class="kpi-card-body">
+        <div class="field-group">
+          <label>KPI Name *</label>
+          <input type="text" id="k2-name" placeholder="e.g. % Inventory Accuracy" oninput="updateProgress();syncScorecard()">
+        </div>
+        <div class="kpi-grid">
+          <div class="field-group">
+            <label>Linked Objective</label>
+            <input type="text" id="k2-obj" placeholder="Which objective does this support?" oninput="updateProgress()">
+          </div>
+          <div class="field-group">
+            <label>Success Indicator</label>
+            <input type="text" id="k2-si" placeholder="Which indicator from Block 3?" oninput="updateProgress()">
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label>Definition *</label>
+            <textarea id="k2-def" placeholder="What exactly does this KPI measure?" oninput="updateProgress()"></textarea>
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label>Formula / Calculation *</label>
+            <textarea id="k2-formula" placeholder="How is this calculated?" style="font-family:'DM Mono',monospace;font-size:13px;" oninput="updateProgress()"></textarea>
+          </div>
+          <div class="field-group">
+            <label>Baseline (Current Performance)</label>
+            <input type="text" id="k2-baseline" placeholder="Current measurement" oninput="updateProgress();syncScorecard()">
+          </div>
+          <div class="field-group">
+            <label>Data Source</label>
+            <input type="text" id="k2-src" placeholder="Where does this data come from?" oninput="updateProgress()">
+          </div>
+          <div class="field-group">
+            <label>Unit of Measurement</label>
+            <input type="text" id="k2-unit" placeholder="e.g. %, #, Score" oninput="updateProgress()">
+          </div>
+          <div class="field-group">
+            <label>Review Frequency</label>
+            <input type="text" id="k2-freq" placeholder="e.g. Quarterly" oninput="updateProgress()">
+          </div>
+        </div>
+        <div class="section-label" style="margin-top:6px;">Performance Standard Rating (1–5)</div>
+        <table class="rating-def-table">
+          <thead><tr><th>Rating</th><th>Level</th><th>Define the specific threshold for your KPI</th></tr></thead>
+          <tbody>
+            <tr class="rd1"><td class="rn">1</td><td class="rl">Unsatisfactory</td><td><input type="text" id="k2-r1" placeholder="Below..." oninput="updateProgress()"></td></tr>
+            <tr class="rd2"><td class="rn">2</td><td class="rl">Developing</td><td><input type="text" id="k2-r2" placeholder="Between..." oninput="updateProgress()"></td></tr>
+            <tr class="rd3"><td class="rn">3</td><td class="rl">Meets Standard</td><td><input type="text" id="k2-r3" placeholder="Minimum acceptable standard..." oninput="updateProgress()"></td></tr>
+            <tr class="rd4"><td class="rn">4</td><td class="rl">Exceeds Standard</td><td><input type="text" id="k2-r4" placeholder="Above standard..." oninput="updateProgress()"></td></tr>
+            <tr class="rd5"><td class="rn">5</td><td class="rl">Outstanding</td><td><input type="text" id="k2-r5" placeholder="Best-in-class..." oninput="updateProgress()"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- KPI 3 -->
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <h3>KPI 3</h3>
+        <span>Complete all fields</span>
+      </div>
+      <div class="kpi-card-body">
+        <div class="field-group">
+          <label>KPI Name *</label>
+          <input type="text" id="k3-name" placeholder="e.g. % Procurement Savings" oninput="updateProgress();syncScorecard()">
+        </div>
+        <div class="kpi-grid">
+          <div class="field-group">
+            <label>Linked Objective</label>
+            <input type="text" id="k3-obj" placeholder="Which objective does this support?" oninput="updateProgress()">
+          </div>
+          <div class="field-group">
+            <label>Success Indicator</label>
+            <input type="text" id="k3-si" placeholder="Which indicator from Block 3?" oninput="updateProgress()">
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label>Definition *</label>
+            <textarea id="k3-def" placeholder="What exactly does this KPI measure?" oninput="updateProgress()"></textarea>
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label>Formula / Calculation *</label>
+            <textarea id="k3-formula" placeholder="How is this calculated?" style="font-family:'DM Mono',monospace;font-size:13px;" oninput="updateProgress()"></textarea>
+          </div>
+          <div class="field-group">
+            <label>Baseline (Current Performance)</label>
+            <input type="text" id="k3-baseline" placeholder="Current measurement" oninput="updateProgress();syncScorecard()">
+          </div>
+          <div class="field-group">
+            <label>Data Source</label>
+            <input type="text" id="k3-src" placeholder="Where does this data come from?" oninput="updateProgress()">
+          </div>
+          <div class="field-group">
+            <label>Unit of Measurement</label>
+            <input type="text" id="k3-unit" placeholder="e.g. %" oninput="updateProgress()">
+          </div>
+          <div class="field-group">
+            <label>Review Frequency</label>
+            <input type="text" id="k3-freq" placeholder="e.g. Monthly" oninput="updateProgress()">
+          </div>
+        </div>
+        <div class="section-label" style="margin-top:6px;">Performance Standard Rating (1–5)</div>
+        <table class="rating-def-table">
+          <thead><tr><th>Rating</th><th>Level</th><th>Define the specific threshold for your KPI</th></tr></thead>
+          <tbody>
+            <tr class="rd1"><td class="rn">1</td><td class="rl">Unsatisfactory</td><td><input type="text" id="k3-r1" placeholder="Below..." oninput="updateProgress()"></td></tr>
+            <tr class="rd2"><td class="rn">2</td><td class="rl">Developing</td><td><input type="text" id="k3-r2" placeholder="Between..." oninput="updateProgress()"></td></tr>
+            <tr class="rd3"><td class="rn">3</td><td class="rl">Meets Standard</td><td><input type="text" id="k3-r3" placeholder="Minimum acceptable standard..." oninput="updateProgress()"></td></tr>
+            <tr class="rd4"><td class="rn">4</td><td class="rl">Exceeds Standard</td><td><input type="text" id="k3-r4" placeholder="Above standard..." oninput="updateProgress()"></td></tr>
+            <tr class="rd5"><td class="rn">5</td><td class="rl">Outstanding</td><td><input type="text" id="k3-r5" placeholder="Best-in-class..." oninput="updateProgress()"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>My notes from Block 4</label>
+      <textarea id="b4-notes" placeholder="Group discussion insights, facilitator tips..." oninput="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- ══ BLOCK 5 ══ -->
+  <div class="block-section" id="block5">
+    <div class="block-header">
+      <div class="block-num">Block 5</div>
+      <div class="block-header-text">
+        <h2>Baselines &amp; Targets</h2>
+        <div class="block-time">30 minutes</div>
+      </div>
+    </div>
+    <div class="facilitator-note">
+      "Baseline is where you are today; target is where you want to be. Rating 3 is the minimum acceptable standard — the rung you must reach. Ratings 4 and 5 are stretch goals — they show excellence and best-in-class performance."
+    </div>
+    <div class="activity-box">
+      <div class="activity-box-title">Activity Instructions</div>
+      <ul>
+        <li>Return to each KPI template (Block 4) and confirm the Baseline — your current performance level.</li>
+        <li>Define the Target for Rating 3 — the minimum acceptable standard.</li>
+        <li>Use the table below as a quick-reference summary across all three KPIs.</li>
+      </ul>
+    </div>
+
+    <div class="section-label">Baseline &amp; Target Quick-Reference</div>
+    <table class="data-table">
+      <thead><tr><th>KPI Name</th><th>Baseline — Where we are now</th><th>Target — Rating 3 (Minimum Standard)</th><th>Stretch — Rating 5 (Outstanding)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="label-col" id="sc-kpi1-ref" style="font-size:12px;">KPI 1</td>
+          <td><input type="text" id="b5-base1" placeholder="Current performance" oninput="updateProgress();syncScorecard()"></td>
+          <td><input type="text" id="b5-tgt1" placeholder="Rating 3 threshold" oninput="updateProgress();syncScorecard()"></td>
+          <td><input type="text" id="b5-str1" placeholder="Rating 5 — outstanding" oninput="updateProgress()"></td>
+        </tr>
+        <tr>
+          <td class="label-col" id="sc-kpi2-ref" style="font-size:12px;">KPI 2</td>
+          <td><input type="text" id="b5-base2" placeholder="Current performance" oninput="updateProgress();syncScorecard()"></td>
+          <td><input type="text" id="b5-tgt2" placeholder="Rating 3 threshold" oninput="updateProgress();syncScorecard()"></td>
+          <td><input type="text" id="b5-str2" placeholder="Rating 5 — outstanding" oninput="updateProgress()"></td>
+        </tr>
+        <tr>
+          <td class="label-col" id="sc-kpi3-ref" style="font-size:12px;">KPI 3</td>
+          <td><input type="text" id="b5-base3" placeholder="Current performance" oninput="updateProgress();syncScorecard()"></td>
+          <td><input type="text" id="b5-tgt3" placeholder="Rating 3 threshold" oninput="updateProgress();syncScorecard()"></td>
+          <td><input type="text" id="b5-str3" placeholder="Rating 5 — outstanding" oninput="updateProgress()"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="prompt-box">
+      <span class="prompt-icon">💬</span>
+      <p><strong>Reflection Prompt:</strong> If you had to explain your Rating 3 standard to a new team member in one sentence, what would you say?</p>
+    </div>
+    <div class="field-group">
+      <label>My Rating 3 standard in plain language</label>
+      <textarea id="b5-r3plain" placeholder="Write your one-sentence explanation here..." oninput="updateProgress()"></textarea>
+    </div>
+    <div class="field-group">
+      <label>My notes from Block 5</label>
+      <textarea id="b5-notes" placeholder="Additional reflections..." oninput="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- ══ BLOCK 6 — SCORECARD ══ -->
+  <div class="block-section" id="block6">
+    <div class="block-header">
+      <div class="block-num">Block 6</div>
+      <div class="block-header-text">
+        <h2>Department KPI Scorecard</h2>
+        <div class="block-time">20 minutes</div>
+      </div>
+    </div>
+    <div class="facilitator-note">
+      "This scorecard is your department's performance mirror — it shows where you are, where you're going, and how you'll know you've arrived. This is your key deliverable from today."
+    </div>
+    <div class="activity-box">
+      <div class="activity-box-title">Activity Instructions</div>
+      <ul>
+        <li>The scorecard below is pre-filled from your Block 4 &amp; 5 work — review and complete any gaps.</li>
+        <li>Every row should have: KPI Name → Definition → Formula → Baseline → Target → Rating.</li>
+        <li>This scorecard is your deliverable — download the PDF to take back to your department.</li>
+      </ul>
+    </div>
+
+    <div class="scorecard-wrap">
+      <div class="scorecard-header">
+        <h3>Department KPI Scorecard</h3>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:1.5px;">YOUR KEY DELIVERABLE</span>
+      </div>
+      <div class="scorecard-meta">
+        <div class="meta-field">
+          <label>Department</label>
+          <input type="text" id="sc-dept" placeholder="Your department name" oninput="updateProgress()">
+        </div>
+        <div class="meta-field">
+          <label>Prepared By</label>
+          <input type="text" id="sc-by" placeholder="Your name" oninput="updateProgress()">
+        </div>
+        <div class="meta-field">
+          <label>Period</label>
+          <input type="text" id="sc-period" placeholder="e.g. Q3 2025" oninput="updateProgress()">
+        </div>
+        <div class="meta-field">
+          <label>Date</label>
+          <input type="text" id="sc-date" placeholder="Today's date" oninput="updateProgress()">
+        </div>
+      </div>
+      <table class="scorecard-table">
+        <thead>
+          <tr>
+            <th style="width:30px;">#</th>
+            <th style="width:18%">KPI Name</th>
+            <th style="width:20%">Definition</th>
+            <th style="width:18%">Formula</th>
+            <th style="width:10%">Baseline</th>
+            <th style="width:10%">Target (R3)</th>
+            <th style="width:8%">Current Rating</th>
+            <th style="width:10%">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-num">01</td>
+            <td><input type="text" id="sc-k1-name" placeholder="KPI name" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k1-def" placeholder="Short definition" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k1-formula" placeholder="Formula" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k1-base" placeholder="Current" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k1-tgt" placeholder="Target" oninput="updateProgress()"></td>
+            <td>
+              <select class="status-select" id="sc-k1-rating" onchange="updateProgress()">
+                <option value="">—</option>
+                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+              </select>
+            </td>
+            <td>
+              <select class="status-select" id="sc-k1-status" onchange="updateProgress()">
+                <option value="">—</option>
+                <option>On Track</option><option>At Risk</option><option>Behind</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td class="row-num">02</td>
+            <td><input type="text" id="sc-k2-name" placeholder="KPI name" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k2-def" placeholder="Short definition" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k2-formula" placeholder="Formula" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k2-base" placeholder="Current" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k2-tgt" placeholder="Target" oninput="updateProgress()"></td>
+            <td>
+              <select class="status-select" id="sc-k2-rating" onchange="updateProgress()">
+                <option value="">—</option>
+                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+              </select>
+            </td>
+            <td>
+              <select class="status-select" id="sc-k2-status" onchange="updateProgress()">
+                <option value="">—</option>
+                <option>On Track</option><option>At Risk</option><option>Behind</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td class="row-num">03</td>
+            <td><input type="text" id="sc-k3-name" placeholder="KPI name" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k3-def" placeholder="Short definition" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k3-formula" placeholder="Formula" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k3-base" placeholder="Current" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k3-tgt" placeholder="Target" oninput="updateProgress()"></td>
+            <td>
+              <select class="status-select" id="sc-k3-rating" onchange="updateProgress()">
+                <option value="">—</option>
+                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+              </select>
+            </td>
+            <td>
+              <select class="status-select" id="sc-k3-status" onchange="updateProgress()">
+                <option value="">—</option>
+                <option>On Track</option><option>At Risk</option><option>Behind</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td class="row-num">04</td>
+            <td><input type="text" id="sc-k4-name" placeholder="Additional KPI" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k4-def" placeholder="Short definition" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k4-formula" placeholder="Formula" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k4-base" placeholder="Current" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k4-tgt" placeholder="Target" oninput="updateProgress()"></td>
+            <td>
+              <select class="status-select" id="sc-k4-rating" onchange="updateProgress()">
+                <option value="">—</option>
+                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+              </select>
+            </td>
+            <td>
+              <select class="status-select" id="sc-k4-status" onchange="updateProgress()">
+                <option value="">—</option>
+                <option>On Track</option><option>At Risk</option><option>Behind</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td class="row-num">05</td>
+            <td><input type="text" id="sc-k5-name" placeholder="Additional KPI" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k5-def" placeholder="Short definition" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k5-formula" placeholder="Formula" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k5-base" placeholder="Current" oninput="updateProgress()"></td>
+            <td><input type="text" id="sc-k5-tgt" placeholder="Target" oninput="updateProgress()"></td>
+            <td>
+              <select class="status-select" id="sc-k5-rating" onchange="updateProgress()">
+                <option value="">—</option>
+                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+              </select>
+            </td>
+            <td>
+              <select class="status-select" id="sc-k5-status" onchange="updateProgress()">
+                <option value="">—</option>
+                <option>On Track</option><option>At Risk</option><option>Behind</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ BLOCK 7 ══ -->
+  <div class="block-section" id="block7">
+    <div class="block-header">
+      <div class="block-num">Block 7</div>
+      <div class="block-header-text">
+        <h2>Gallery Walk &amp; Commitments</h2>
+        <div class="block-time">20 minutes</div>
+      </div>
+    </div>
+    <div class="facilitator-note">
+      "Walk around and review each other's scorecards. Ask questions, give feedback, share ideas. KPIs are living tools — they evolve as your department grows. Each group will share one KPI they will start tracking immediately."
+    </div>
+    <div class="activity-box">
+      <div class="activity-box-title">Activity Instructions</div>
+      <ul>
+        <li>Post or share your completed KPI Scorecard (digitally or on screen).</li>
+        <li>Review at least two other participants' scorecards during the gallery walk.</li>
+        <li>Leave two pieces of feedback: one strength, one suggestion.</li>
+        <li>Be ready to share the one KPI your department will start tracking next week.</li>
+      </ul>
+    </div>
+
+    <div class="section-label">Gallery Walk — Observation Notes</div>
+    <table class="gallery-table">
+      <thead><tr><th style="width:30%">Department / Scorecard I reviewed</th><th style="width:35%">One strength I observed</th><th style="width:35%">One suggestion I offered</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><input type="text" id="gw-d1" placeholder="Department name" oninput="updateProgress()"></td>
+          <td><input type="text" id="gw-s1" placeholder="What stood out positively" oninput="updateProgress()"></td>
+          <td><input type="text" id="gw-r1" placeholder="Your suggestion" oninput="updateProgress()"></td>
+        </tr>
+        <tr>
+          <td><input type="text" id="gw-d2" placeholder="Department name" oninput="updateProgress()"></td>
+          <td><input type="text" id="gw-s2" placeholder="What stood out positively" oninput="updateProgress()"></td>
+          <td><input type="text" id="gw-r2" placeholder="Your suggestion" oninput="updateProgress()"></td>
+        </tr>
+        <tr>
+          <td><input type="text" id="gw-d3" placeholder="Department name" oninput="updateProgress()"></td>
+          <td><input type="text" id="gw-s3" placeholder="What stood out positively" oninput="updateProgress()"></td>
+          <td><input type="text" id="gw-r3" placeholder="Your suggestion" oninput="updateProgress()"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Commitment section -->
+    <div class="commitment-box">
+      <h3>My Commitment to Action</h3>
+      <div class="commitment-field">
+        <label>The ONE KPI my department will start tracking next week:</label>
+        <input type="text" id="cm-kpi" placeholder="Name the KPI..." oninput="updateProgress()">
+      </div>
+      <div class="commitment-field">
+        <label>I will share this KPI with my team by:</label>
+        <input type="text" id="cm-date" placeholder="Specific date..." oninput="updateProgress()">
+      </div>
+      <div class="commitment-field">
+        <label>Who will support me in tracking this KPI:</label>
+        <input type="text" id="cm-support" placeholder="Name a colleague or manager..." oninput="updateProgress()">
+      </div>
+      <div class="commitment-field">
+        <label>One barrier I may face and how I will address it:</label>
+        <input type="text" id="cm-barrier" placeholder="Barrier and your plan to overcome it..." oninput="updateProgress()">
+      </div>
+      <div class="sig-row">
+        <div class="commitment-field" style="margin-bottom:0">
+          <label>Signature</label>
+          <input type="text" id="cm-sig" placeholder="Type your name as signature" oninput="updateProgress()">
+        </div>
+        <div class="commitment-field" style="margin-bottom:0">
+          <label>Date</label>
+          <input type="text" id="cm-sigdate" placeholder="Today's date" oninput="updateProgress()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAKEAWAYS ══ -->
+  <div class="takeaways-section" id="takeaways">
+    <div class="section-label">My Key Takeaways</div>
+    <div class="field-row" style="margin-bottom:16px;">
+      <div class="field-group" style="margin-bottom:0">
+        <label>The most important thing I learned today</label>
+        <textarea id="tk-1" placeholder="Your key insight from the workshop..." oninput="updateProgress()"></textarea>
+      </div>
+      <div class="field-group" style="margin-bottom:0">
+        <label>One thing I will do differently as a result</label>
+        <textarea id="tk-2" placeholder="A specific behaviour or action you will change..." oninput="updateProgress()"></textarea>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>A question I still want to explore</label>
+      <textarea id="tk-3" placeholder="What would you like to investigate further?" oninput="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- ══ PDF DOWNLOAD BUTTON (bottom) ══ -->
+  <div style="text-align:center;padding:32px 0 60px;" id="bottom-download">
+    <button class="btn btn-primary" style="font-size:15px;padding:14px 36px;border-radius:8px;" onclick="downloadPDF()">
+      ⬇ Download Completed Workbook as PDF
+    </button>
+    <p style="margin-top:12px;font-size:12px;color:var(--muted);">Opens your browser's print dialog — select "Save as PDF" as the destination.</p>
+  </div>
+
+</div><!-- end page-wrap -->
+
+<script>
+// ── Auto-save to localStorage ──────────────────────────────────────────────
+const SAVE_KEY = 'scm_kpi_workbook_v1';
+
+function getAllFields() {
+  return document.querySelectorAll('input[type="text"], textarea, select');
+}
+
+function saveProgress() {
+  const data = {};
+  getAllFields().forEach(el => { if (el.id) data[el.id] = el.value; });
+  localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+  // brief visual feedback
+  const btn = document.querySelector('.btn-outline');
+  const orig = btn.textContent;
+  btn.textContent = '✓ Saved';
+  btn.style.borderColor = '#6ee7b7';
+  btn.style.color = '#6ee7b7';
+  setTimeout(() => {
+    btn.textContent = orig;
+    btn.style.borderColor = '';
+    btn.style.color = '';
+  }, 1800);
+}
+
+function loadProgress() {
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    Object.entries(data).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    });
+    syncScorecardNames();
+    updateProgress();
+  } catch(e) {}
+}
+
+// ── Progress bar ───────────────────────────────────────────────────────────
+function updateProgress() {
+  const fields = getAllFields();
+  const filled = Array.from(fields).filter(el => el.value && el.value.trim() !== '' && el.value !== '—').length;
+  const pct = Math.min(100, Math.round((filled / fields.length) * 100));
+  document.getElementById('progressBar').style.width = pct + '%';
+  // auto-save debounced
+  clearTimeout(window._saveTimer);
+  window._saveTimer = setTimeout(saveProgress, 800);
+  // sync scorecard KPI name labels in Block 5
+  syncScorecardNames();
+}
+
+// ── Sync KPI names into scorecard and Block 5 table ───────────────────────
+function syncScorecard() {
+  // Sync KPI names to scorecard
+  ['1','2','3'].forEach(n => {
+    const name = (document.getElementById('k'+n+'-name') || {}).value || '';
+    const scName = document.getElementById('sc-k'+n+'-name');
+    const def    = (document.getElementById('k'+n+'-def') || {}).value || '';
+    const formula= (document.getElementById('k'+n+'-formula') || {}).value || '';
+    const base   = (document.getElementById('k'+n+'-baseline') || {}).value || '';
+
+    if (scName && !scName.value && name) scName.value = name;
+    const scDef = document.getElementById('sc-k'+n+'-def');
+    if (scDef && !scDef.value && def) scDef.value = def.substring(0,80);
+    const scForm = document.getElementById('sc-k'+n+'-formula');
+    if (scForm && !scForm.value && formula) scForm.value = formula.substring(0,60);
+    const scBase = document.getElementById('sc-k'+n+'-base');
+    if (scBase && !scBase.value && base) scBase.value = base;
+
+    // sync b5 baseline
+    const b5Base = document.getElementById('b5-base'+n);
+    if (b5Base && !b5Base.value && base) b5Base.value = base;
+
+    // update block 5 ref labels
+    const ref = document.getElementById('sc-kpi'+n+'-ref');
+    if (ref) ref.textContent = name || 'KPI '+n;
+
+    // sync block 5 targets to scorecard
+    const tgt = (document.getElementById('b5-tgt'+n) || {}).value || '';
+    const scTgt = document.getElementById('sc-k'+n+'-tgt');
+    if (scTgt && !scTgt.value && tgt) scTgt.value = tgt;
+  });
+}
+
+function syncScorecardNames() {
+  ['1','2','3'].forEach(n => {
+    const name = (document.getElementById('k'+n+'-name') || {}).value || '';
+    const ref = document.getElementById('sc-kpi'+n+'-ref');
+    if (ref) ref.textContent = name || 'KPI '+n;
+  });
+}
+
+// ── PDF / Print ───────────────────────────────────────────────────────────
+function downloadPDF() {
+  // Brief instruction toast
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#1B3A5C;color:#fff;padding:14px 24px;border-radius:8px;
+    font-family:'DM Sans',sans-serif;font-size:13px;z-index:9999;
+    box-shadow:0 4px 24px rgba(0,0,0,0.25);text-align:center;
+    border-top:3px solid #C9A84C;max-width:380px;line-height:1.5;
+  `;
+  toast.innerHTML = '<strong>In the print dialog:</strong><br>Set Destination to <em>"Save as PDF"</em> → Click Save';
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    saveProgress();
+    window.print();
+    setTimeout(() => toast.remove(), 3000);
+  }, 400);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadProgress();
+  // Set today's date on cover if empty
+  const dateField = document.getElementById('cv-date');
+  if (!dateField.value) {
+    const d = new Date();
+    dateField.value = d.toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+  }
+  updateProgress();
+});
+</script>
+</body>
+</html>
